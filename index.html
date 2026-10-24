@@ -193,7 +193,14 @@ footer{max-width:1280px;width:100%;margin:auto;border-top:1px solid rgba(255,255
 @keyframes fromBack{0%{transform:translate(10px,10px) scale(.95);z-index:0}45%{transform:translateX(75%) rotate(9deg);z-index:0}55%{transform:translateX(75%) rotate(9deg);z-index:2}100%{transform:none;z-index:2}}
 .hobby[data-s=photo] .hc-front,.hobby[data-s=front] .hc-photo{animation:toBack .8s cubic-bezier(.45,.05,.25,1) forwards}
 .hobby[data-s=photo] .hc-photo,.hobby[data-s=front] .hc-front{animation:fromBack .8s cubic-bezier(.45,.05,.25,1) forwards}
-@media(prefers-reduced-motion:reduce){.hobby .hc{animation-duration:.01s!important}}
+.hobby .pstage{position:absolute;inset:0}
+.hobby .pcap{display:flex;justify-content:space-between;align-items:flex-end;gap:.5rem;pointer-events:none}
+.hobby .pcnt{font:700 .75rem 'Space Mono',monospace;color:#fff;opacity:.9}
+.hobby .pdel{position:absolute;top:.6rem;left:.6rem;z-index:3;border:1px solid rgba(255,255,255,.25);background:rgba(10,3,4,.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font:700 .68rem Montserrat,sans-serif;padding:.4rem .7rem;border-radius:10px;cursor:pointer}
+.hobby .pdel:hover{background:#b3202a;border-color:#b3202a}
+.hobby .pnav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(10,3,4,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-size:1.3rem;line-height:1;cursor:pointer;display:grid;place-items:center}
+.hobby .pnav:hover{background:var(--acc);border-color:var(--acc)}
+.hobby .pnav.prev{left:.5rem}.hobby .pnav.next{right:.5rem}
 .modal.open .hobby{animation:dropIn .9s cubic-bezier(.22,1,.36,1) both}
 .modal.open .hobby:nth-child(1){animation-delay:.6s}.modal.open .hobby:nth-child(2){animation-delay:.72s}.modal.open .hobby:nth-child(3){animation-delay:.84s}.modal.open .hobby:nth-child(4){animation-delay:.96s}.modal.open .hobby:nth-child(5){animation-delay:1.08s}.modal.open .hobby:nth-child(6){animation-delay:1.2s}
 
@@ -946,10 +953,14 @@ let tasks = normTasks(loadJSON(TASK_KEY, DEFAULT_TASKS));
 let expenses = normExp(loadJSON(EXP_KEY, []));
 let classes = loadJSON(CLS_KEY, []);
 let maps = loadJSON(MAP_KEY, []);
+const HOBI_KEY = "hobi-foto-v1";
+let hobiPics = loadJSON(HOBI_KEY, {});
+let currentUser = null;
 const saveTasks = () => { saveJSON(TASK_KEY, tasks); pushCloud(); };
 const saveExp = () => { saveJSON(EXP_KEY, expenses); pushCloud(); };
 const saveCls = () => { saveJSON(CLS_KEY, classes); pushCloud(); };
 const saveMaps = () => { saveJSON(MAP_KEY, maps); pushCloud(); };
+const saveHobi = () => { saveJSON(HOBI_KEY, hobiPics); pushCloud(); };
 
 /* TUGAS */
 const list = $("todoList"), input = $("todoInput"), dueInput = $("todoDue");
@@ -1285,18 +1296,54 @@ const IDB = {
   set(k, v){ return this.run("readwrite", s => s.put(v, k)); },
   del(k){ return this.run("readwrite", s => s.delete(k)); }
 };
-async function putImg(id, data){ memImg[id] = data; try { await IDB.set(id, data); } catch { toast("Foto hanya tersimpan sementara (penyimpanan browser tidak tersedia)"); } }
-async function getImg(id){ if (memImg[id]) return memImg[id]; try { return await IDB.get(id); } catch { return null; } }
+let cloudWarned = false;
+const photosCol = () => currentUser ? firebase.firestore().collection("users").doc(currentUser.uid).collection("photos") : null;
+function cloudFail(e){
+  console.error("Foto cloud:", e);
+  if (!cloudWarned) { cloudWarned = true; toast("Foto belum bisa disimpan ke akun. Perbarui aturan Firestore (lihat petunjuk)."); }
+}
+async function cloudPut(id, data){ const c = photosCol(); if (!c) return false; try { await c.doc(id).set({d:data, t:Date.now()}); return true; } catch (e) { cloudFail(e); return false; } }
+async function cloudGet(id){ const c = photosCol(); if (!c) return null; try { const d = await c.doc(id).get(); return d.exists ? d.data().d : null; } catch (e) { cloudFail(e); return null; } }
+async function cloudDel(id){ const c = photosCol(); if (!c) return; try { await c.doc(id).delete(); } catch (e) { cloudFail(e); } }
+async function putImg(id, data){
+  memImg[id] = data;
+  try { await IDB.set(id, data); } catch {}
+  return cloudPut(id, data);
+}
+async function getImg(id){
+  if (memImg[id]) return memImg[id];
+  try { const v = await IDB.get(id); if (v) { memImg[id] = v; return v; } } catch {}
+  const c = await cloudGet(id);
+  if (c) { memImg[id] = c; try { await IDB.set(id, c); } catch {} return c; }
+  return null;
+}
+async function delImg(id){ delete memImg[id]; try { await IDB.del(id); } catch {} cloudDel(id); }
+async function syncLocalPhotos(){
+  if (!currentUser) return;
+  const ids = [...maps.map(m => m.id), ...Object.values(hobiPics).flat()];
+  const key = "foto-sync-" + currentUser.uid, done = new Set(loadJSON(key, []));
+  for (const id of ids) {
+    if (done.has(id)) continue;
+    let v = null; try { v = await IDB.get(id); } catch {}
+    if (v && await cloudPut(id, v)) { done.add(id); saveJSON(key, [...done]); }
+  }
+}
 function shrink(file, max = 900){
   return new Promise((res, rej) => {
     const fr = new FileReader(); fr.onerror = rej;
     fr.onload = () => {
       const im = new Image(); im.onerror = rej;
       im.onload = () => {
-        const s = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement("canvas");
-        c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
-        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
-        res(c.toDataURL("image/jpeg", .85));
+        let m = max, q = .82, out = "";
+        for (let k = 0; k < 6; k++) {
+          const s = Math.min(1, m / Math.max(im.width, im.height)), c = document.createElement("canvas");
+          c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+          c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+          out = c.toDataURL("image/jpeg", q);
+          if (out.length < 600000) break;
+          m *= .8; q = Math.max(.5, q - .08);
+        }
+        res(out);
       };
       im.src = fr.result;
     };
@@ -1339,7 +1386,7 @@ function renderMaps(){
     const del = el("button", "del", "×"); del.type = "button"; del.setAttribute("aria-label", "Hapus map");
     del.onclick = async () => {
       if (!confirm("Hapus map “" + m.name + "”?")) return;
-      maps = maps.filter(x => x.id !== m.id); delete memImg[m.id]; try { await IDB.del(m.id); } catch {}
+      maps = maps.filter(x => x.id !== m.id); await delImg(m.id);
       saveMaps(); renderMaps();
     };
     acts.appendChild(del);
@@ -1359,59 +1406,88 @@ $("mapForm").addEventListener("submit", async e => {
 });
 renderMaps();
 
-/* HOBI — kartu digeser ke belakang, lalu muncul foto hobi */
+/* HOBI — kartu digeser ke belakang, lalu muncul galeri foto (banyak foto, tersimpan di akun) */
+const HOBI_ICONS = {
+  musik:'<path d="M4 15v-3a8 8 0 0116 0v3"/><rect x="3" y="14" width="4" height="7" rx="1.5"/><rect x="17" y="14" width="4" height="7" rx="1.5"/>',
+  kode:'<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>',
+  film:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/>',
+  kopi:'<path d="M4 9h12v5a5 5 0 01-5 5H9a5 5 0 01-5-5zM16 10h2a2.5 2.5 0 010 5h-2M7 3v2M11 3v2"/>',
+  game:'<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10v5M4.5 12.5h5M16 11.5h.01M18.5 13.5h.01"/>',
+  gunung:'<path d="M2 20l7-12 4 7 3-4 6 9z"/>'
+};
+const HOBI = [
+  ["musik","Mendengarkan musik","Teman setia saat belajar dan santai."],
+  ["kode","Ngoding","Bereksperimen membuat website kecil."],
+  ["film","Nonton","Anime, movie, dan youtuber."],
+  ["kopi","Ngopi santai","Mencari kafe dengan suasana tenang."],
+  ["game","Bermain game","Pelepas penat di akhir pekan."],
+  ["gunung","Mendaki gunung","Mengejar pemandangan di puncak."]
+];
+const CAM = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+const hobiCur = {};
+let hobiBuilt = false;
+async function updateHobiPhoto(w, k){
+  const card = w.querySelector(".hc-photo"), stage = card.querySelector(".pstage"), list = hobiPics[k] || [];
+  const cur = Math.min(hobiCur[k] || 0, Math.max(0, list.length - 1)); hobiCur[k] = cur;
+  card.querySelector(".pdel").hidden = !list.length;
+  card.querySelectorAll(".pnav").forEach(b => b.hidden = list.length < 2);
+  card.querySelector(".pcnt").textContent = list.length ? (cur + 1) + "/" + list.length : "";
+  const tok = card._tok = (card._tok || 0) + 1;
+  if (!list.length) { stage.innerHTML = `<div class="pph">${CAM}<span>Belum ada foto</span></div>`; return; }
+  const d = await getImg(list[cur]);
+  if (tok !== card._tok) return;
+  if (!d) { stage.innerHTML = `<div class="pph">${CAM}<span>Foto belum tersedia di perangkat ini</span></div>`; return; }
+  stage.innerHTML = ""; const img = document.createElement("img"); img.className = "pimg"; img.alt = ""; img.src = d; stage.appendChild(img);
+}
+function refreshHobi(){ if (hobiBuilt) document.querySelectorAll(".hobby").forEach(w => updateHobiPhoto(w, w.dataset.k)); }
 (function(){
-  const ICONS = {
-    musik:'<path d="M4 15v-3a8 8 0 0116 0v3"/><rect x="3" y="14" width="4" height="7" rx="1.5"/><rect x="17" y="14" width="4" height="7" rx="1.5"/>',
-    kode:'<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>',
-    film:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/>',
-    kopi:'<path d="M4 9h12v5a5 5 0 01-5 5H9a5 5 0 01-5-5zM16 10h2a2.5 2.5 0 010 5h-2M7 3v2M11 3v2"/>',
-    game:'<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10v5M4.5 12.5h5M16 11.500h.01M18.500 13.500h.01"/>',
-    gunung:'<path d="M2 20l7-12 4 7 3-4 6 9z"/>'
-  };
-  const HOBI = [
-    ["musik","Mendengarkan musik","Teman setia saat belajar dan santai."],
-    ["kode","Ngoding","Bereksperimen membuat website kecil."],
-    ["film","Nonton","Anime, movie, dan youtuber."],
-    ["kopi","Ngopi santai","Mencari kafe dengan suasana tenang."],
-    ["game","Bermain game","Pelepas penat di akhir pekan."],
-    ["gunung","Mendaki gunung","Mengejar pemandangan di puncak."]
-  ];
-  const CAM = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13" r="3.5"/></svg>';
   const host = $("hobbies"); host.innerHTML = "";
-  async function showPhoto(card, id){
-    const d = await getImg(id); if (!d) return;
-    let img = card.querySelector(".pimg");
-    if (!img) { img = document.createElement("img"); img.className = "pimg"; img.alt = ""; card.prepend(img); const ph = card.querySelector(".pph"); if (ph) ph.remove(); }
-    img.src = d;
-    card.querySelector(".pup").textContent = "Ganti foto";
-  }
   HOBI.forEach(([ic, title, desc], i) => {
-    const id = "hobi-" + (i + 1);
-    const w = el("div", "hobby"); w.dataset.s = "front"; w.tabIndex = 0; w.setAttribute("role", "button");
+    const k = String(i + 1);
+    const w = el("div", "hobby"); w.dataset.s = "idle"; w.dataset.k = k; w.tabIndex = 0; w.setAttribute("role", "button");
     w.setAttribute("aria-label", title + " — klik untuk melihat foto");
-    w.innerHTML = `<div class="box hc hc-front"><span class="no">${pad(i + 1)}</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[ic]}</svg><h4></h4><p></p><span class="tap">Ketuk untuk lihat foto</span></div>`
-      + `<div class="box hc hc-photo"><div class="pph">${CAM}<span>Belum ada foto</span></div><button type="button" class="pup">Upload foto</button><div class="pcap"></div></div>`;
-    w.querySelector("h4").textContent = title; w.querySelector("p").textContent = desc;
-    w.querySelector(".pcap").textContent = title;
-    const photo = w.querySelector(".hc-photo");
-    w.querySelector(".pup").onclick = e => {
-      e.stopPropagation();
-      const f = document.createElement("input"); f.type = "file"; f.accept = "image/*";
+    w.innerHTML = `<div class="box hc hc-front"><span class="no">${pad(i + 1)}</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${HOBI_ICONS[ic]}</svg><h4></h4><p></p><span class="tap">Ketuk untuk lihat foto</span></div>`
+      + `<div class="box hc hc-photo"><div class="pstage"></div><button type="button" class="pup">+ Foto</button><button type="button" class="pdel" hidden>Hapus</button><button type="button" class="pnav prev" aria-label="Foto sebelumnya" hidden>‹</button><button type="button" class="pnav next" aria-label="Foto berikutnya" hidden>›</button><div class="pcap"><span class="ptt"></span><span class="pcnt"></span></div></div>`;
+    w.querySelector("h4").textContent = title; w.querySelector("p").textContent = desc; w.querySelector(".ptt").textContent = title;
+    const q = sel => w.querySelector(sel), stop = (sel, fn) => q(sel).addEventListener("click", e => { e.stopPropagation(); fn(); });
+    stop(".pup", () => {
+      const f = document.createElement("input"); f.type = "file"; f.accept = "image/*"; f.multiple = true;
       f.onchange = async () => {
-        if (!f.files[0]) return;
-        try { await putImg(id, await shrink(f.files[0])); showPhoto(photo, id); toast("Foto hobi disimpan"); } catch { toast("Gagal membaca foto"); }
+        const files = [...f.files].slice(0, 10); if (!files.length) return;
+        toast("Mengunggah " + files.length + " foto…");
+        const list = hobiPics[k] || (hobiPics[k] = []); let cloudOk = true;
+        for (const file of files) {
+          try { const id = "hp" + Date.now() + Math.random().toString(36).slice(2, 6); cloudOk = (await putImg(id, await shrink(file))) && cloudOk; list.push(id); } catch {}
+        }
+        hobiCur[k] = list.length - 1; saveHobi(); updateHobiPhoto(w, k);
+        if (cloudOk) toast("Foto tersimpan di akunmu");
       };
       f.click();
-    };
+    });
+    stop(".pdel", () => {
+      const list = hobiPics[k] || []; if (!list.length || !confirm("Hapus foto ini?")) return;
+      const id = list.splice(hobiCur[k] || 0, 1)[0]; delImg(id); saveHobi(); updateHobiPhoto(w, k);
+    });
+    stop(".prev", () => { const n = (hobiPics[k] || []).length; hobiCur[k] = ((hobiCur[k] || 0) - 1 + n) % n; updateHobiPhoto(w, k); });
+    stop(".next", () => { const n = (hobiPics[k] || []).length; hobiCur[k] = ((hobiCur[k] || 0) + 1) % n; updateHobiPhoto(w, k); });
     const flip = () => {
       w.dataset.s = w.dataset.s === "photo" ? "front" : "photo";
-      w.classList.add("anim"); clearTimeout(w._t); w._t = setTimeout(() => w.classList.remove("anim"), 850);
+      w.classList.add("anim"); clearTimeout(w._t); w._t = setTimeout(() => w.classList.remove("anim"), 900);
     };
     w.onclick = flip;
     w.onkeydown = e => { if ((e.key === "Enter" || e.key === " ") && e.target === w) { e.preventDefault(); flip(); } };
-    host.appendChild(w); showPhoto(photo, id);
+    host.appendChild(w);
   });
+  hobiBuilt = true;
+  // migrasi foto tunggal dari versi sebelumnya
+  (async () => {
+    for (let i = 1; i <= HOBI.length; i++) {
+      const k = String(i);
+      if (hobiPics[k] && hobiPics[k].length) continue;
+      try { if (await IDB.get("hobi-" + k)) { hobiPics[k] = ["hobi-" + k]; saveJSON(HOBI_KEY, hobiPics); } } catch {}
+    }
+    refreshHobi();
+  })();
 })();
 
 /* JADWAL KULIAH (Senin–Jumat) */
@@ -1480,19 +1556,18 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth(), db = firebase.firestore();
-let currentUser = null;
 function pushCloud(){
   if (!currentUser) return;
-  db.collection("users").doc(currentUser.uid).set({tasks, expenses, classes, maps, updated:Date.now()})
+  db.collection("users").doc(currentUser.uid).set({tasks, expenses, classes, maps, hobiPics, updated:Date.now()})
     .catch(err => console.error("Gagal sinkron:", err));
 }
-function renderAll(){ renderTasks(); renderExp(); renderSchedule(); renderMaps(); }
+function renderAll(){ renderTasks(); renderExp(); renderSchedule(); renderMaps(); refreshHobi(); }
 auth.onAuthStateChanged(async user => {
   currentUser = user;
   document.body.classList.toggle("in", !!user);
   if (!user) {
-    tasks = DEFAULT_TASKS.map(t => ({...t})); expenses = []; classes = []; maps = [];
-    saveJSON(TASK_KEY, tasks); saveJSON(EXP_KEY, expenses); saveJSON(CLS_KEY, classes); saveJSON(MAP_KEY, maps);
+    tasks = DEFAULT_TASKS.map(t => ({...t})); expenses = []; classes = []; maps = []; hobiPics = {};
+    saveJSON(TASK_KEY, tasks); saveJSON(EXP_KEY, expenses); saveJSON(CLS_KEY, classes); saveJSON(MAP_KEY, maps); saveJSON(HOBI_KEY, hobiPics);
     renderAll(); return;
   }
   try {
@@ -1501,9 +1576,11 @@ auth.onAuthStateChanged(async user => {
       const d = snap.data();
       tasks = normTasks(d.tasks); expenses = normExp(d.expenses); classes = d.classes || [];
       if (Array.isArray(d.maps)) maps = d.maps;
-      saveJSON(TASK_KEY, tasks); saveJSON(EXP_KEY, expenses); saveJSON(CLS_KEY, classes); saveJSON(MAP_KEY, maps);
+      if (d.hobiPics && typeof d.hobiPics === "object") hobiPics = d.hobiPics;
+      saveJSON(TASK_KEY, tasks); saveJSON(EXP_KEY, expenses); saveJSON(CLS_KEY, classes); saveJSON(MAP_KEY, maps); saveJSON(HOBI_KEY, hobiPics);
       renderAll();
-    } else pushCloud();
+    } else { pushCloud(); renderAll(); }
+    syncLocalPhotos();
   } catch (err) { console.error("Gagal memuat data:", err); }
 });
 const authForm = $("authForm"), authEmail = $("authEmail"), authPass = $("authPass"), authMsg = $("authMsg");
