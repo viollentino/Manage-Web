@@ -163,7 +163,10 @@ footer{max-width:1280px;width:100%;margin:auto;border-top:1px solid rgba(255,255
 /* KEUANGAN: di HP, ringkasan saldo tampil paling atas */
 @media(max-width:999px){
   #m-uang .hud-l,#m-uang .frame{display:contents}
-  #m-uang .stats,#m-uang .row-top{order:-1;margin-bottom:0}
+  #m-uang .hud-l>*,#m-uang .frame>*{order:3}
+  #m-uang .h-tag,#m-uang .h-title,#m-uang .h-sub{order:0}
+  #m-uang .stats,#m-uang .row-top{order:1;margin-bottom:0}
+  #m-uang .hud-l>.box{order:2}
 }
 
 /* HOBI */
