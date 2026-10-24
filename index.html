@@ -2,14 +2,15 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" id="metaTheme" content="#080203">
 <title>Viollen</title>
 <meta name="description" content="Profil pribadi: tentang saya, hobi, tugas, keuangan, portofolio, dan jadwal kuliah.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--acc:#e50914;--acc-rgb:229,9,20;--acc-text:#ff6b72;--bg1:#080203;--bg2:#630a10;--bg3:#120305;--mx:50%;--my:50%;--ok:#5fd38d;--info:#6fb1ff;--warn:#f0c36a;--bad:#ff6b72;--muted:#a9a0a1;--line:rgba(255,255,255,.12)}
+:root{--acc:#e50914;--acc-rgb:229,9,20;--acc-text:#ff6b72;--bg1:#080203;--bg2:#630a10;--bg3:#120305;--g1r:74,4,8;--g2r:142,10,18;--g3r:208,24,34;--mx:50%;--my:50%;--ok:#5fd38d;--info:#6fb1ff;--warn:#f0c36a;--bad:#ff6b72;--muted:#a9a0a1;--line:rgba(255,255,255,.12)}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;color-scheme:dark}
 body{font-family:Inter,system-ui,sans-serif;color:#fff;min-height:100vh;overflow-x:hidden;line-height:1.6;background-color:var(--bg1);background-image:radial-gradient(ellipse at 65% 50%,var(--bg2) 0%,var(--bg3) 50%,var(--bg1) 100%);background-attachment:fixed}
@@ -43,18 +44,17 @@ button,input,select{font:inherit;color:inherit}
 @media(max-width:1100px){.links,.nav .btn.out{display:none}.burger{display:block}}
 
 /* HERO */
-main{position:relative;background:var(--bg1);width:100%;height:max(560px,calc(100vh - 90px));clip-path:inset(-120px 0 0 0)}
+main{position:relative;background:var(--bg1);width:100%;height:max(560px,calc(100vh - 90px));height:max(560px,calc(100dvh - 90px));clip-path:inset(-120px 0 0 0)}
 main::after{content:"";position:absolute;left:0;right:0;bottom:0;height:32%;z-index:3;pointer-events:none;background:linear-gradient(transparent,rgba(0,0,0,.92))}
 .name{position:absolute;z-index:1;left:0;right:0;top:38%;transform:translateY(-50%);text-align:center;pointer-events:none;user-select:none;font-family:Inter,sans-serif;font-weight:900;text-transform:uppercase;line-height:1;letter-spacing:-.02em;font-size:10vw}
-/* Gradien merah gelap, dimiringkan 30° (100° → 130°) */
+/* Gradien mengikuti warna aksen (--g1r/--g2r/--g3r), dimiringkan 30° */
 .name span{display:inline-block;white-space:nowrap;transform:scaleY(1.15);color:transparent;-webkit-text-fill-color:transparent;-webkit-background-clip:text;background-clip:text;background-repeat:no-repeat;background-size:400% 100%,100% 100%;background-position:0% 0,0 0;
-  background-image:linear-gradient(130deg,rgba(74,4,8,0) 0%,rgba(74,4,8,0) 44%,#4a0408 46%,#8e0a12 48%,#d01822 50%,#8e0a12 52%,#4a0408 54%,rgba(74,4,8,0) 56%,rgba(74,4,8,0) 100%),linear-gradient(#fff,#fff)}
+  background-image:linear-gradient(130deg,rgba(var(--g1r),0) 0%,rgba(var(--g1r),0) 44%,rgb(var(--g1r)) 46%,rgb(var(--g2r)) 48%,rgb(var(--g3r)) 50%,rgb(var(--g2r)) 52%,rgb(var(--g1r)) 54%,rgba(var(--g1r),0) 56%,rgba(var(--g1r),0) 100%),linear-gradient(#fff,#fff)}
 @keyframes sweep{0%{background-position:0% 0,0 0}70%,100%{background-position:100% 0,0 0}}
-/* Nama hanya "timbul" (muncul perlahan), tanpa efek wipe */
 @keyframes nameIn{from{opacity:0;transform:translateY(-50%) scale(.9)}to{opacity:1;transform:translateY(-50%) scale(1)}}
 body.in .name span{animation:sweep 9s linear 2.6s infinite}
 .hero-obj{position:absolute;z-index:2;left:50%;margin:0;top:-4vh;height:120vh;width:auto;max-width:none;display:block;transform:translateX(-50%);-webkit-mask-image:linear-gradient(#000 48%,transparent 68%);mask-image:linear-gradient(#000 48%,transparent 68%)}
-.social{position:absolute;left:0;right:0;margin:0 auto;width:max-content;bottom:1.6rem;z-index:5;display:flex;gap:.3rem;padding:.4rem;border-radius:18px;background:rgba(20,8,10,.7);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.social{position:absolute;left:0;right:0;margin:0 auto;width:max-content;bottom:calc(1.6rem + env(safe-area-inset-bottom,0px));z-index:5;display:flex;gap:.3rem;padding:.4rem;border-radius:18px;background:rgba(20,8,10,.7);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .sbtn{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;transition:background .4s,transform .4s}
 .sbtn svg{width:20px;height:20px;fill:#fff}
 .sbtn:hover{background:var(--acc);transform:translateY(-2px)}
@@ -73,21 +73,28 @@ body.in .hero-obj{animation:heroIn 1.9s cubic-bezier(.22,1,.36,1) .5s both,float
 body.in .smoke{opacity:1}
 .smoke i{position:absolute;width:48vw;height:48vw;border-radius:50%;background:radial-gradient(circle,rgba(var(--acc-rgb),.34) 0%,rgba(var(--acc-rgb),.12) 42%,transparent 70%);left:0;top:0;will-change:transform}
 .smoke i:nth-child(2),.smoke i:nth-child(5){width:58vw;height:58vw}
-.smoke i:nth-child(even){background:radial-gradient(circle,rgba(110,24,30,.4) 0%,rgba(60,10,14,.18) 45%,transparent 70%)}
+.smoke i:nth-child(even){background:radial-gradient(circle,rgba(var(--g2r),.5) 0%,rgba(var(--g1r),.25) 45%,transparent 70%)}
 #embers{position:absolute;inset:-120px 0 0 0;width:100%;height:calc(100% + 120px);z-index:0;pointer-events:none}
 @media(max-width:700px){.smoke i{width:95vw;height:95vw}.smoke i:nth-child(2),.smoke i:nth-child(5){width:110vw;height:110vw}}
 body.in .social{animation:riseUp 1.4s cubic-bezier(.22,1,.36,1) 1.5s both}
-@media(max-width:700px){.name{top:36%}.hero-obj{height:78vh;top:6vh}}
+@media(max-width:700px){
+  .name{top:36%}
+  .hero-obj{height:78vh;height:78dvh;top:6vh}
+  /* naikkan bar sosial supaya tidak tertutup bar browser HP */
+  .social{bottom:calc(3.2rem + env(safe-area-inset-bottom,0px))}
+}
 
-footer{max-width:1280px;width:100%;margin:auto;border-top:1px solid rgba(255,255,255,.1);padding:1rem 1.25rem 1.4rem;display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap;color:#8d8485;font-size:.78rem}
+footer{max-width:1280px;width:100%;margin:auto;border-top:1px solid rgba(255,255,255,.1);padding:1rem 1.25rem calc(1.4rem + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap;color:#8d8485;font-size:.78rem}
 .themes{display:flex;align-items:center;gap:.6rem}
 .themes button{width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.4);cursor:pointer}
+.themes .custom{width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.4);overflow:hidden;position:relative;background:conic-gradient(#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);cursor:pointer}
+.themes .custom input{position:absolute;inset:-6px;width:40px;height:40px;opacity:0;cursor:pointer;border:0;padding:0}
 
 /* MODAL */
 .modal{position:fixed;inset:0;z-index:60;display:flex;background:#0a0304;visibility:hidden;pointer-events:none;transform:translateY(-100%);transition:transform .95s cubic-bezier(.22,1,.36,1),visibility 0s linear .95s}
 .modal.open{visibility:visible;pointer-events:auto;transform:none;transition:transform .95s cubic-bezier(.22,1,.36,1),visibility 0s}
 .panel,.panel.glass{position:relative;flex:1;width:100%;min-width:0;height:100%;overflow:hidden;border-radius:0;padding:0;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;background:radial-gradient(circle at 75% 0%,rgba(var(--acc-rgb),.18),transparent 55%),radial-gradient(circle at 0% 100%,rgba(var(--acc-rgb),.10),transparent 50%),#0a0304}
-.pscroll{height:100%;overflow-y:auto;overflow-x:hidden;padding:5.2rem 1rem 2.4rem;display:flex}
+.pscroll{height:100%;overflow-y:auto;overflow-x:hidden;padding:5.2rem 1rem calc(2.4rem + env(safe-area-inset-bottom,0px));display:flex}
 .pscroll>*{max-width:1000px;margin:auto;width:100%;min-width:0}
 @media(min-width:900px){.pscroll{padding:5.5rem 2rem 3rem}}
 @keyframes dropIn{from{opacity:0;transform:translateY(-34px)}to{opacity:1;transform:none}}
@@ -171,6 +178,8 @@ input[type=date],input[type=time],input[type=month]{min-width:0;max-width:100%;-
 .fl.grow{flex:1 1 140px}.fl.sm{flex:1 1 130px}.fl.full{flex:1 0 100%}
 .field{width:100%;min-width:0;max-width:100%;padding:.7rem .9rem;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.45);font-size:.9rem;min-height:42px}
 .field:focus{outline:none;border-color:var(--acc-text)}
+input[type=file].field{padding:.5rem .6rem;cursor:pointer}
+input[type=file]::file-selector-button{margin-right:.7rem;padding:.4rem .8rem;border:0;border-radius:8px;background:var(--acc);color:#fff;font-weight:700;cursor:pointer}
 select.field option{background:#1a0a0c}
 .submit{padding:.75rem 1.2rem;border:0;border-radius:12px;background:var(--acc);font:700 .85rem Montserrat,sans-serif;letter-spacing:.04em;cursor:pointer;box-shadow:0 0 18px rgba(var(--acc-rgb),.35)}
 .submit.wide{flex:1 0 100%}
@@ -299,6 +308,23 @@ select.field option{background:#1a0a0c}
 .proj .meta{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
 .tagl{font-size:.72rem;font-weight:600;padding:.2rem .7rem;border-radius:8px;background:rgba(255,255,255,.07);border:1px solid var(--line)}
 .tagl.star{margin-left:auto;color:var(--warn)}
+.port-sec{margin-bottom:1.8rem}
+.port-sec .box.formbox{margin-bottom:1rem}
+.mapcard{padding:0;overflow:hidden;display:flex;flex-direction:column;transition:transform .35s,box-shadow .35s}
+.mapcard:hover{transform:translateY(-4px);box-shadow:0 0 28px rgba(var(--acc-rgb),.35)}
+.thumb{position:relative;aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,rgba(var(--acc-rgb),.4),rgba(0,0,0,.65))}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.thumb .ph{font-size:2.6rem;filter:drop-shadow(0 0 12px rgba(var(--acc-rgb),.7))}
+.chg{position:absolute;right:.6rem;bottom:.6rem;z-index:2;border:1px solid rgba(255,255,255,.25);background:rgba(10,3,4,.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font:700 .7rem Montserrat,sans-serif;padding:.4rem .7rem;border-radius:10px;cursor:pointer}
+.chg:hover{background:var(--acc);border-color:var(--acc)}
+.mbody{display:flex;flex-direction:column;gap:.5rem;padding:1rem 1.1rem 1.1rem;flex:1}
+.mbody h4{font:800 1.1rem Montserrat,sans-serif;text-transform:uppercase;line-height:1.2;overflow-wrap:anywhere}
+.mbody p{font-size:.86rem;color:#d0c8c9;flex:1;overflow-wrap:anywhere}
+.mbody .acts{display:flex;align-items:center;gap:.5rem;margin-top:.3rem}
+.mbody .acts .btn{padding:.6rem 1rem;font-size:.72rem}
+.mbody .acts .del{margin-left:auto}
+.mbody .nolink{font-size:.74rem;color:var(--muted)}
+.modal.open .mapcard{animation:dropIn .9s cubic-bezier(.22,1,.36,1) both}
 
 /* JADWAL */
 .dtabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.4rem;margin-bottom:1rem}
@@ -333,7 +359,7 @@ body.in .gate{display:none}
 .gate-card p{color:var(--muted);font-size:.88rem}
 .gate-card .btn{justify-content:center;width:100%}
 .err{color:var(--bad)!important;min-height:1.3em;font-weight:600}
-.toast{position:fixed;right:1.2rem;bottom:1.2rem;z-index:120;padding:.8rem 1.1rem;border-radius:12px;font-size:.82rem;border:1px solid rgba(var(--acc-rgb),.5);transform:translateY(80px);opacity:0;transition:.5s;pointer-events:none}
+.toast{position:fixed;right:1.2rem;bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));z-index:120;padding:.8rem 1.1rem;border-radius:12px;font-size:.82rem;border:1px solid rgba(var(--acc-rgb),.5);transform:translateY(80px);opacity:0;transition:.5s;pointer-events:none}
 .toast.show{transform:none;opacity:1}
 </style>
 </head>
@@ -406,6 +432,7 @@ body.in .gate{display:none}
       <button style="background:#059669" data-theme="emerald" title="Hijau" aria-label="Tema hijau"></button>
       <button style="background:#7c3aed" data-theme="purple" title="Ungu" aria-label="Tema ungu"></button>
       <button style="background:#2563eb" data-theme="blue" title="Biru" aria-label="Tema biru"></button>
+      <label class="custom" title="Warna kustom"><input type="color" id="customColor" value="#e50914" aria-label="Pilih warna aksen sendiri"></label>
     </div>
   </footer>
 </div>
@@ -565,7 +592,7 @@ body.in .gate{display:none}
     <div class="hud-l">
       <p class="h-tag">[ 05 . PORTFOLIO ]</p>
       <h3 class="h-title one">PORTOFOLIO <em>PROYEK &amp; KODE</em></h3>
-      <p class="h-sub">Proyek dan kode yang pernah saya buat</p>
+      <p class="h-sub">Proyek, map Roblox, dan kode yang pernah saya buat</p>
       <div class="box gh-card">
         <div class="gh-top">
           <span class="g"><svg aria-hidden="true"><use href="#i-gh"/></svg></span>
@@ -587,7 +614,21 @@ body.in .gate{display:none}
       </div>
     </div>
     <div class="frame">
-      <h4 class="h-head">Proyek unggulan</h4>
+      <div class="port-sec">
+        <h4 class="h-head">🎮 Roblox Maps</h4>
+        <div class="box formbox">
+          <h5>Tambah map Roblox</h5>
+          <form class="form g2" id="mapForm">
+            <label class="fl full">Nama map<input class="field" type="text" id="mapName" placeholder="Contoh: Obby Gunung Kediri" maxlength="60" autocomplete="off"></label>
+            <label class="fl full">Link map Roblox<input class="field" type="text" id="mapLink" placeholder="https://www.roblox.com/games/..." inputmode="url" autocomplete="off"></label>
+            <label class="fl full">Deskripsi singkat<input class="field" type="text" id="mapDesc" placeholder="Map obby 30 stage dengan tema pendakian" maxlength="140" autocomplete="off"></label>
+            <label class="fl full">Foto / thumbnail<input class="field" type="file" id="mapPhoto" accept="image/*"></label>
+            <button class="submit full" type="submit">TAMBAH MAP (+)</button>
+          </form>
+        </div>
+        <div class="projs" id="mapGrid"></div>
+      </div>
+      <h4 class="h-head">Proyek unggulan (GitHub)</h4>
       <div class="projs" id="projGrid"><p class="empty" style="grid-column:1/-1">Memuat proyek dari GitHub…</p></div>
     </div>
   </div>
@@ -726,22 +767,45 @@ document.querySelectorAll(".modal").forEach(m => m.addEventListener("mousedown",
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeModals(); });
 $("burger").onclick = () => $("mobile").classList.toggle("open");
 
-/* TEMA & LATAR */
+/* TEMA & LATAR — satu warna aksen mengatur semuanya (termasuk gradien VIOLLENTINO) */
 const THEMES = {
-  maroon:  {acc:"#e50914", rgb:"229,9,20",  text:"#ff6b72", b1:"#080203", b2:"#630a10", b3:"#120305", name:"Maroon"},
-  emerald: {acc:"#059669", rgb:"5,150,105",  text:"#34d399", b1:"#02120a", b2:"#064e3b", b3:"#02180e", name:"Hijau"},
-  purple:  {acc:"#7c3aed", rgb:"124,58,237", text:"#a78bfa", b1:"#0d0212", b2:"#4c1d95", b3:"#14041e", name:"Ungu"},
-  blue:    {acc:"#2563eb", rgb:"37,99,235",  text:"#60a5fa", b1:"#020712", b2:"#12317a", b3:"#040b1c", name:"Biru"}
+  maroon:  {acc:"#e50914", rgb:"229,9,20",  text:"#ff6b72", b1:"#080203", b2:"#630a10", b3:"#120305", g:["74,4,8","142,10,18","208,24,34"],   name:"Maroon"},
+  emerald: {acc:"#059669", rgb:"5,150,105",  text:"#34d399", b1:"#02120a", b2:"#064e3b", b3:"#02180e", g:["3,48,31","4,120,87","16,185,129"],  name:"Hijau"},
+  purple:  {acc:"#7c3aed", rgb:"124,58,237", text:"#a78bfa", b1:"#0d0212", b2:"#4c1d95", b3:"#14041e", g:["46,16,101","91,33,182","139,92,246"], name:"Ungu"},
+  blue:    {acc:"#2563eb", rgb:"37,99,235",  text:"#60a5fa", b1:"#020712", b2:"#12317a", b3:"#040b1c", g:["11,31,92","29,78,216","59,130,246"],  name:"Biru"}
 };
+function rgb2hsl(r, g, b){
+  r /= 255; g /= 255; b /= 255;
+  const M = Math.max(r, g, b), m = Math.min(r, g, b), d = M - m; let h = 0;
+  if (d) { h = M === r ? ((g - b) / d) % 6 : M === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360; }
+  const l = (M + m) / 2, s = d ? d / (1 - Math.abs(2 * l - 1)) : 0;
+  return [h, s, l];
+}
+function hsl2rgb(h, s, l){
+  const a = s * Math.min(l, 1 - l), f = n => { const k = (n + h / 30) % 12; return Math.round(255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)))); };
+  return [f(0), f(8), f(4)];
+}
+function deriveTheme(hex){
+  const v = parseInt(hex.slice(1), 16), r = v >> 16 & 255, g = v >> 8 & 255, b = v & 255;
+  const [h, s] = rgb2hsl(r, g, b), S = Math.max(.45, s);
+  const c = (sat, lum) => hsl2rgb(h, sat, lum), css = a => `rgb(${a.join(",")})`, tr = a => a.join(",");
+  return {acc:hex, rgb:`${r},${g},${b}`, text:css(c(Math.min(1, S), .72)), b1:css(c(.5, .03)), b2:css(c(.7, .2)), b3:css(c(.5, .06)),
+    g:[tr(c(.9, .15)), tr(c(.8, .32)), tr(c(.75, .5))], name:"Kustom"};
+}
 function setTheme(k, quiet){
-  const t = THEMES[k]; if (!t) return;
+  const t = k && k.startsWith("custom:") ? deriveTheme(k.slice(7)) : THEMES[k]; if (!t) return;
   const r = document.documentElement.style;
   r.setProperty("--acc", t.acc); r.setProperty("--acc-rgb", t.rgb); r.setProperty("--acc-text", t.text);
   r.setProperty("--bg1", t.b1); r.setProperty("--bg2", t.b2); r.setProperty("--bg3", t.b3);
+  r.setProperty("--g1r", t.g[0]); r.setProperty("--g2r", t.g[1]); r.setProperty("--g3r", t.g[2]);
+  $("metaTheme").setAttribute("content", t.b1);
+  if (k.startsWith("custom:")) $("customColor").value = k.slice(7);
   saveJSON("tema-profil", k);
   if (!quiet) toast("Tema " + t.name + " aktif");
 }
 document.querySelectorAll("[data-theme]").forEach(b => b.onclick = () => setTheme(b.dataset.theme));
+$("customColor").addEventListener("input", e => setTheme("custom:" + e.target.value, true));
+$("customColor").addEventListener("change", e => setTheme("custom:" + e.target.value));
 setTheme(loadJSON("tema-profil", "maroon"), true);
 (function(){
   const c = $("bg"), x = c.getContext("2d");
@@ -794,7 +858,7 @@ setTheme(loadJSON("tema-profil", "maroon"), true);
   })();
 })();
 
-/* PERCIKAN API (naik dari bawah ke atas) */
+/* PERCIKAN API (naik dari bawah ke atas) — warna mengikuti aksen */
 (function(){
   const c = $("embers"), x = c.getContext("2d"), main = document.querySelector("main");
   let W = 0, H = 0, ps = [];
@@ -823,7 +887,7 @@ setTheme(loadJSON("tema-profil", "maroon"), true);
         g.addColorStop(.4, `rgba(${col},${a * .5})`);
         g.addColorStop(1, `rgba(${col},0)`);
         x.fillStyle = g; x.beginPath(); x.arc(p.x, p.y, p.r * 4, 0, 6.283); x.fill();
-        x.fillStyle = p.hot ? `rgba(255,205,170,${a})` : `rgba(255,120,110,${a})`;
+        x.fillStyle = p.hot ? `rgba(255,255,255,${a})` : `rgba(${col},${Math.min(1, a * 1.6)})`;
         x.beginPath(); x.arc(p.x, p.y, p.r * .8, 0, 6.283); x.fill();
       });
       x.globalCompositeOperation = "source-over";
@@ -849,15 +913,17 @@ const DEFAULT_TASKS = [
   {text:"Belajar JavaScript 30 menit", done:false, due:null},
   {text:"Merapikan catatan kuliah", done:true, due:null}
 ];
-const TASK_KEY = "todo-profil-v1", EXP_KEY = "pengeluaran-profil-v1", CLS_KEY = "jadwal-kuliah-v1";
+const TASK_KEY = "todo-profil-v1", EXP_KEY = "pengeluaran-profil-v1", CLS_KEY = "jadwal-kuliah-v1", MAP_KEY = "roblox-maps-v1";
 const normTasks = a => (a || []).map(t => ({text:t.text, done:!!t.done, due:t.due || null}));
 const normExp = a => (a || []).map(x => ({...x, type: x.type || "out", src: x.src || "", goal: x.goal || "", place: x.place || "", target: Number(x.target) || 0}));
 let tasks = normTasks(loadJSON(TASK_KEY, DEFAULT_TASKS));
 let expenses = normExp(loadJSON(EXP_KEY, []));
 let classes = loadJSON(CLS_KEY, []);
+let maps = loadJSON(MAP_KEY, []);
 const saveTasks = () => { saveJSON(TASK_KEY, tasks); pushCloud(); };
 const saveExp = () => { saveJSON(EXP_KEY, expenses); pushCloud(); };
 const saveCls = () => { saveJSON(CLS_KEY, classes); pushCloud(); };
+const saveMaps = () => { saveJSON(MAP_KEY, maps); pushCloud(); };
 
 /* TUGAS */
 const list = $("todoList"), input = $("todoInput"), dueInput = $("todoDue");
@@ -948,7 +1014,7 @@ const SOURCES = {
 };
 const GOALS  = ["Dana Darurat","Event ML","Laptop","HP/Gadget","Mendaki","Liburan","Biaya Kuliah","Top Up Game","Lainnya"];
 const PLACES = ["SeaBank","Celengan/Tunai","Rekening Bank","Dana","GoPay","ShopeePay","Emas","Reksadana","Lainnya"];
-const PAL = ["#e50914","#6fb1ff","#5fd38d","#f0c36a","#a78bfa","#ff9f43","#2dd4bf","#f472b6","#94a3b8","#84cc16","#38bdf8","#fb7185"];
+const PAL = ["var(--acc)","#6fb1ff","#5fd38d","#f0c36a","#a78bfa","#ff9f43","#2dd4bf","#f472b6","#94a3b8","#84cc16","#38bdf8","#fb7185"];
 const expNote = $("expNote"), expAmount = $("expAmount"), expDate = $("expDate"), expMonth = $("expMonth"), expType = $("expType"), expSrc = $("expSrc");
 expDate.value = todayISO(); expMonth.value = todayISO().slice(0, 7);
 const sum = pred => expenses.filter(pred).reduce((s, x) => s + x.amount, 0);
@@ -1133,7 +1199,7 @@ $("expForm").addEventListener("submit", e => {
 expMonth.onchange = () => { if (!expMonth.value) expMonth.value = todayISO().slice(0, 7); renderExp(); };
 renderExp();
 
-/* PORTOFOLIO */
+/* PORTOFOLIO — GitHub */
 async function loadGithub(){
   const user = SOCIAL.github.split("/").pop();
   const grid = $("projGrid");
@@ -1146,7 +1212,6 @@ async function loadGithub(){
     $("gRepo").textContent = pr.public_repos ?? rp.length;
     $("gStar").textContent = rp.reduce((s, r) => s + r.stargazers_count, 0);
     $("gFol").textContent = pr.followers ?? 0;
-    // grid aktivitas push (18 minggu)
     const gg = $("gGrid"); gg.innerHTML = "";
     const pushed = new Set(rp.map(r => (r.pushed_at || "").slice(0, 10)));
     const start = new Date(); start.setHours(0,0,0,0); start.setDate(start.getDate() - (18 * 7 - 1));
@@ -1177,9 +1242,100 @@ async function loadGithub(){
 }
 loadGithub();
 
+/* PORTOFOLIO — ROBLOX MAPS (foto disimpan di IndexedDB perangkat ini) */
+const memImg = {};
+const IDB = {
+  p: null,
+  open(){ return this.p || (this.p = new Promise((res, rej) => {
+    const r = indexedDB.open("viollen-img", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("i");
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  })); },
+  async run(mode, fn){
+    const d = await this.open();
+    return new Promise((res, rej) => { const q = fn(d.transaction("i", mode).objectStore("i")); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
+  },
+  get(k){ return this.run("readonly", s => s.get(k)); },
+  set(k, v){ return this.run("readwrite", s => s.put(v, k)); },
+  del(k){ return this.run("readwrite", s => s.delete(k)); }
+};
+async function putImg(id, data){ memImg[id] = data; try { await IDB.set(id, data); } catch { toast("Foto hanya tersimpan sementara (penyimpanan browser tidak tersedia)"); } }
+async function getImg(id){ if (memImg[id]) return memImg[id]; try { return await IDB.get(id); } catch { return null; } }
+function shrink(file, max = 900){
+  return new Promise((res, rej) => {
+    const fr = new FileReader(); fr.onerror = rej;
+    fr.onload = () => {
+      const im = new Image(); im.onerror = rej;
+      im.onload = () => {
+        const s = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement("canvas");
+        c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+        res(c.toDataURL("image/jpeg", .85));
+      };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+function safeUrl(s){
+  s = (s || "").trim(); if (!s) return "";
+  if (!/^https?:\/\//i.test(s)) s = "https://" + s;
+  try { const u = new URL(s); return /^https?:$/.test(u.protocol) ? u.href : ""; } catch { return ""; }
+}
+async function setThumb(box, id){
+  const data = await getImg(id); if (!data) return;
+  let img = box.querySelector("img");
+  if (!img) { img = document.createElement("img"); img.alt = ""; img.loading = "lazy"; box.prepend(img); const ph = box.querySelector(".ph"); if (ph) ph.remove(); }
+  img.src = data;
+}
+function renderMaps(){
+  const g = $("mapGrid"); g.innerHTML = "";
+  if (!maps.length) {
+    const p = el("p", "empty", "Belum ada map Roblox. Tambahkan map pertamamu lewat formulir di atas."); p.style.gridColumn = "1/-1"; g.appendChild(p); return;
+  }
+  maps.forEach((m, i) => {
+    const card = el("article", "box mapcard"); card.style.animationDelay = (.6 + i * .1) + "s";
+    const th = el("div", "thumb"); th.appendChild(el("span", "ph", "🎮")); setThumb(th, m.id);
+    const chg = el("button", "chg", "📷 Foto"); chg.type = "button"; chg.setAttribute("aria-label", "Ganti foto " + m.name);
+    chg.onclick = () => {
+      const f = document.createElement("input"); f.type = "file"; f.accept = "image/*";
+      f.onchange = async () => {
+        if (!f.files[0]) return;
+        try { await putImg(m.id, await shrink(f.files[0])); setThumb(th, m.id); toast("Foto diperbarui"); } catch { toast("Gagal membaca foto"); }
+      };
+      f.click();
+    };
+    th.appendChild(chg);
+    const body = el("div", "mbody");
+    const acts = el("div", "acts");
+    if (m.link) { const a = el("a", "btn red", "MAIN DI ROBLOX ↗"); a.href = m.link; a.target = "_blank"; a.rel = "noopener noreferrer"; acts.appendChild(a); }
+    else acts.appendChild(el("span", "nolink", "Link belum diisi"));
+    const del = el("button", "del", "×"); del.type = "button"; del.setAttribute("aria-label", "Hapus map");
+    del.onclick = async () => {
+      if (!confirm("Hapus map “" + m.name + "”?")) return;
+      maps = maps.filter(x => x.id !== m.id); delete memImg[m.id]; try { await IDB.del(m.id); } catch {}
+      saveMaps(); renderMaps();
+    };
+    acts.appendChild(del);
+    body.append(el("h4", "", m.name), el("p", "", m.desc || "Belum ada deskripsi."), acts);
+    card.append(th, body); g.appendChild(card);
+  });
+}
+$("mapForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const name = $("mapName").value.trim(), raw = $("mapLink").value.trim(), link = safeUrl(raw), file = $("mapPhoto").files[0];
+  if (!name) { $("mapName").focus(); return; }
+  if (raw && !link) { toast("Link tidak valid"); $("mapLink").focus(); return; }
+  const id = "map" + Date.now();
+  if (file) { try { await putImg(id, await shrink(file)); } catch { toast("Foto gagal dibaca, map disimpan tanpa foto"); } }
+  maps.unshift({id, name, link, desc:$("mapDesc").value.trim()});
+  $("mapForm").reset(); saveMaps(); renderMaps(); toast("Map ditambahkan");
+});
+renderMaps();
+
 /* JADWAL KULIAH (Senin–Jumat) */
 const DAYS = ["Senin","Selasa","Rabu","Kamis","Jumat"];
-const todayIdx = (new Date().getDay() + 6) % 7;   // 5/6 = akhir pekan (tidak ada di jadwal)
+const todayIdx = (new Date().getDay() + 6) % 7;
 let activeDay = todayIdx < 5 ? todayIdx : 0;
 $("clsDay").value = DAYS[activeDay];
 const calCls = makeCal($("clsCal"), "Kalender akademik", () => {
@@ -1246,16 +1402,16 @@ const auth = firebase.auth(), db = firebase.firestore();
 let currentUser = null;
 function pushCloud(){
   if (!currentUser) return;
-  db.collection("users").doc(currentUser.uid).set({tasks, expenses, classes, updated:Date.now()})
+  db.collection("users").doc(currentUser.uid).set({tasks, expenses, classes, maps, updated:Date.now()})
     .catch(err => console.error("Gagal sinkron:", err));
 }
-function renderAll(){ renderTasks(); renderExp(); renderSchedule(); }
+function renderAll(){ renderTasks(); renderExp(); renderSchedule(); renderMaps(); }
 auth.onAuthStateChanged(async user => {
   currentUser = user;
   document.body.classList.toggle("in", !!user);
   if (!user) {
-    tasks = DEFAULT_TASKS.map(t => ({...t})); expenses = []; classes = [];
-    saveJSON(TASK_KEY, tasks); saveJSON(EXP_KEY, expenses); saveJSON(CLS_KEY, classes);
+    tasks = DEFAULT_TASKS.map(t => ({...t})); expenses = []; classes = []; maps = [];
+    saveJSON(TASK_KEY, tasks); saveJSON(EXP_KEY, expenses); saveJSON(CLS_KEY, classes); saveJSON(MAP_KEY, maps);
     renderAll(); return;
   }
   try {
@@ -1263,7 +1419,8 @@ auth.onAuthStateChanged(async user => {
     if (snap.exists) {
       const d = snap.data();
       tasks = normTasks(d.tasks); expenses = normExp(d.expenses); classes = d.classes || [];
-      saveJSON(TASK_KEY, tasks); saveJSON(EXP_KEY, expenses); saveJSON(CLS_KEY, classes);
+      if (Array.isArray(d.maps)) maps = d.maps;
+      saveJSON(TASK_KEY, tasks); saveJSON(EXP_KEY, expenses); saveJSON(CLS_KEY, classes); saveJSON(MAP_KEY, maps);
       renderAll();
     } else pushCloud();
   } catch (err) { console.error("Gagal memuat data:", err); }
