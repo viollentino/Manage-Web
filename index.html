@@ -176,7 +176,7 @@ footer{max-width:1280px;width:100%;margin:auto;border-top:1px solid rgba(255,255
 .hobby.anim{z-index:6}
 .hobby .hc{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;text-align:left;padding:1.1rem;overflow:hidden;background:#150709}
 .hobby .hc-front{z-index:2}
-.hobby .hc-photo{z-index:0;transform:translate(10px,10px) scale(.95);padding:0}
+.hobby .hc-photo{z-index:0;transform:translate(12px,10px) rotate(2.5deg) scale(.95);padding:0}
 .hobby .no{position:absolute;top:.9rem;left:1.1rem;font:800 1.3rem Montserrat,sans-serif;color:var(--acc)}
 .hobby .ic{position:absolute;top:.8rem;right:1rem;width:38px;height:38px;fill:none;stroke:var(--acc);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 8px rgba(var(--acc-rgb),.5))}
 .hobby h4{font:700 1.05rem/1.25 Montserrat,sans-serif;margin-bottom:.3rem}
@@ -189,10 +189,10 @@ footer{max-width:1280px;width:100%;margin:auto;border-top:1px solid rgba(255,255
 .hobby .pup{position:absolute;top:.6rem;right:.6rem;z-index:3;border:1px solid rgba(255,255,255,.25);background:rgba(10,3,4,.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font:700 .68rem Montserrat,sans-serif;padding:.4rem .7rem;border-radius:10px;cursor:pointer}
 .hobby .pup:hover{background:var(--acc);border-color:var(--acc)}
 /* efek kartu digeser ke belakang tumpukan */
-@keyframes toBack{0%{transform:none;z-index:2}45%{transform:translateX(75%) rotate(9deg);z-index:2}55%{transform:translateX(75%) rotate(9deg);z-index:0}100%{transform:translate(10px,10px) scale(.95);z-index:0}}
-@keyframes fromBack{0%{transform:translate(10px,10px) scale(.95);z-index:0}45%{transform:translateX(75%) rotate(9deg);z-index:0}55%{transform:translateX(75%) rotate(9deg);z-index:2}100%{transform:none;z-index:2}}
+@keyframes toBack{0%{transform:none;z-index:2}45%{transform:translateX(75%) rotate(9deg);z-index:2}55%{transform:translateX(75%) rotate(9deg);z-index:0}100%{transform:translate(12px,10px) rotate(2.5deg) scale(.95);z-index:0}}
+@keyframes comeFront{0%,50%{transform:translate(12px,10px) rotate(2.5deg) scale(.95);z-index:0}55%{transform:translate(12px,10px) rotate(2.5deg) scale(.95);z-index:2}100%{transform:none;z-index:2}}
 .hobby[data-s=photo] .hc-front,.hobby[data-s=front] .hc-photo{animation:toBack .8s cubic-bezier(.45,.05,.25,1) forwards}
-.hobby[data-s=photo] .hc-photo,.hobby[data-s=front] .hc-front{animation:fromBack .8s cubic-bezier(.45,.05,.25,1) forwards}
+.hobby[data-s=photo] .hc-photo,.hobby[data-s=front] .hc-front{animation:comeFront .8s cubic-bezier(.45,.05,.25,1) forwards}
 .hobby .pstage{position:absolute;inset:0}
 .hobby .pcap{display:flex;justify-content:space-between;align-items:flex-end;gap:.5rem;pointer-events:none}
 .hobby .pcnt{font:700 .75rem 'Space Mono',monospace;color:#fff;opacity:.9}
