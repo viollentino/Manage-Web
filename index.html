@@ -172,11 +172,28 @@ footer{max-width:1280px;width:100%;margin:auto;border-top:1px solid rgba(255,255
 /* HOBI */
 .hobbies{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
 @media(max-width:760px){.hobbies{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.hobby{min-height:210px;display:flex;flex-direction:column;justify-content:flex-end;text-align:left;padding:1.1rem}
+.hobby{position:relative;min-height:220px;cursor:pointer;-webkit-tap-highlight-color:transparent;outline-offset:4px}
+.hobby.anim{z-index:6}
+.hobby .hc{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;text-align:left;padding:1.1rem;overflow:hidden;background:#150709}
+.hobby .hc-front{z-index:2}
+.hobby .hc-photo{z-index:0;transform:translate(10px,10px) scale(.95);padding:0}
 .hobby .no{position:absolute;top:.9rem;left:1.1rem;font:800 1.3rem Montserrat,sans-serif;color:var(--acc)}
-.hobby .e{position:absolute;top:.7rem;right:1rem;font-size:2.1rem;filter:drop-shadow(0 0 10px rgba(var(--acc-rgb),.5))}
+.hobby .ic{position:absolute;top:.8rem;right:1rem;width:38px;height:38px;fill:none;stroke:var(--acc);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 8px rgba(var(--acc-rgb),.5))}
 .hobby h4{font:700 1.05rem/1.25 Montserrat,sans-serif;margin-bottom:.3rem}
 .hobby p{font-size:.8rem;color:#c9c0c1}
+.hobby .tap{margin-top:.6rem;font:500 .62rem 'Space Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--acc-text)}
+.hobby .pimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hobby .pph{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:.5rem;color:var(--muted);font-size:.78rem;background:linear-gradient(135deg,rgba(var(--acc-rgb),.35),rgba(0,0,0,.7))}
+.hobby .pph svg{width:40px;height:40px;fill:none;stroke:#fff;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
+.hobby .pcap{position:absolute;left:0;right:0;bottom:0;padding:2.2rem 1rem .9rem;background:linear-gradient(transparent,rgba(0,0,0,.85));font:700 .95rem Montserrat,sans-serif;text-transform:uppercase}
+.hobby .pup{position:absolute;top:.6rem;right:.6rem;z-index:3;border:1px solid rgba(255,255,255,.25);background:rgba(10,3,4,.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font:700 .68rem Montserrat,sans-serif;padding:.4rem .7rem;border-radius:10px;cursor:pointer}
+.hobby .pup:hover{background:var(--acc);border-color:var(--acc)}
+/* efek kartu digeser ke belakang tumpukan */
+@keyframes toBack{0%{transform:none;z-index:2}45%{transform:translateX(75%) rotate(9deg);z-index:2}55%{transform:translateX(75%) rotate(9deg);z-index:0}100%{transform:translate(10px,10px) scale(.95);z-index:0}}
+@keyframes fromBack{0%{transform:translate(10px,10px) scale(.95);z-index:0}45%{transform:translateX(75%) rotate(9deg);z-index:0}55%{transform:translateX(75%) rotate(9deg);z-index:2}100%{transform:none;z-index:2}}
+.hobby[data-s=photo] .hc-front,.hobby[data-s=front] .hc-photo{animation:toBack .8s cubic-bezier(.45,.05,.25,1) forwards}
+.hobby[data-s=photo] .hc-photo,.hobby[data-s=front] .hc-front{animation:fromBack .8s cubic-bezier(.45,.05,.25,1) forwards}
+@media(prefers-reduced-motion:reduce){.hobby .hc{animation-duration:.01s!important}}
 .modal.open .hobby{animation:dropIn .9s cubic-bezier(.22,1,.36,1) both}
 .modal.open .hobby:nth-child(1){animation-delay:.6s}.modal.open .hobby:nth-child(2){animation-delay:.72s}.modal.open .hobby:nth-child(3){animation-delay:.84s}.modal.open .hobby:nth-child(4){animation-delay:.96s}.modal.open .hobby:nth-child(5){animation-delay:1.08s}.modal.open .hobby:nth-child(6){animation-delay:1.2s}
 
@@ -490,14 +507,7 @@ body.in .gate{display:none}
       <p class="h-sub">Yang bikin hari-hari seru</p>
     </div>
     <div class="frame">
-      <div class="hobbies">
-        <article class="box hobby"><span class="no">01</span><div class="e">🎧</div><h4>Mendengarkan musik</h4><p>Teman setia saat belajar dan santai.</p></article>
-        <article class="box hobby"><span class="no">02</span><div class="e">💻</div><h4>Ngoding</h4><p>Bereksperimen membuat website kecil.</p></article>
-        <article class="box hobby"><span class="no">03</span><div class="e">🎥</div><h4>Nonton</h4><p>Anime, movie, dan youtuber.</p></article>
-        <article class="box hobby"><span class="no">04</span><div class="e">☕</div><h4>Ngopi santai</h4><p>Mencari kafe dengan suasana tenang.</p></article>
-        <article class="box hobby"><span class="no">05</span><div class="e">🎮</div><h4>Bermain game</h4><p>Pelepas penat di akhir pekan.</p></article>
-        <article class="box hobby"><span class="no">06</span><div class="e">🏃</div><h4>Lari</h4><p>Jaga stamina dan pikiran tetap segar.</p></article>
-      </div>
+      <div class="hobbies" id="hobbies"></div>
     </div>
   </div>
 </div></div>
@@ -1348,6 +1358,61 @@ $("mapForm").addEventListener("submit", async e => {
   $("mapForm").reset(); saveMaps(); renderMaps(); toast("Map ditambahkan");
 });
 renderMaps();
+
+/* HOBI — kartu digeser ke belakang, lalu muncul foto hobi */
+(function(){
+  const ICONS = {
+    musik:'<path d="M4 15v-3a8 8 0 0116 0v3"/><rect x="3" y="14" width="4" height="7" rx="1.5"/><rect x="17" y="14" width="4" height="7" rx="1.5"/>',
+    kode:'<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>',
+    film:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/>',
+    kopi:'<path d="M4 9h12v5a5 5 0 01-5 5H9a5 5 0 01-5-5zM16 10h2a2.5 2.5 0 010 5h-2M7 3v2M11 3v2"/>',
+    game:'<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10v5M4.5 12.5h5M16 11.500h.01M18.500 13.500h.01"/>',
+    gunung:'<path d="M2 20l7-12 4 7 3-4 6 9z"/>'
+  };
+  const HOBI = [
+    ["musik","Mendengarkan musik","Teman setia saat belajar dan santai."],
+    ["kode","Ngoding","Bereksperimen membuat website kecil."],
+    ["film","Nonton","Anime, movie, dan youtuber."],
+    ["kopi","Ngopi santai","Mencari kafe dengan suasana tenang."],
+    ["game","Bermain game","Pelepas penat di akhir pekan."],
+    ["gunung","Mendaki gunung","Mengejar pemandangan di puncak."]
+  ];
+  const CAM = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+  const host = $("hobbies"); host.innerHTML = "";
+  async function showPhoto(card, id){
+    const d = await getImg(id); if (!d) return;
+    let img = card.querySelector(".pimg");
+    if (!img) { img = document.createElement("img"); img.className = "pimg"; img.alt = ""; card.prepend(img); const ph = card.querySelector(".pph"); if (ph) ph.remove(); }
+    img.src = d;
+    card.querySelector(".pup").textContent = "Ganti foto";
+  }
+  HOBI.forEach(([ic, title, desc], i) => {
+    const id = "hobi-" + (i + 1);
+    const w = el("div", "hobby"); w.dataset.s = "front"; w.tabIndex = 0; w.setAttribute("role", "button");
+    w.setAttribute("aria-label", title + " — klik untuk melihat foto");
+    w.innerHTML = `<div class="box hc hc-front"><span class="no">${pad(i + 1)}</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[ic]}</svg><h4></h4><p></p><span class="tap">Ketuk untuk lihat foto</span></div>`
+      + `<div class="box hc hc-photo"><div class="pph">${CAM}<span>Belum ada foto</span></div><button type="button" class="pup">Upload foto</button><div class="pcap"></div></div>`;
+    w.querySelector("h4").textContent = title; w.querySelector("p").textContent = desc;
+    w.querySelector(".pcap").textContent = title;
+    const photo = w.querySelector(".hc-photo");
+    w.querySelector(".pup").onclick = e => {
+      e.stopPropagation();
+      const f = document.createElement("input"); f.type = "file"; f.accept = "image/*";
+      f.onchange = async () => {
+        if (!f.files[0]) return;
+        try { await putImg(id, await shrink(f.files[0])); showPhoto(photo, id); toast("Foto hobi disimpan"); } catch { toast("Gagal membaca foto"); }
+      };
+      f.click();
+    };
+    const flip = () => {
+      w.dataset.s = w.dataset.s === "photo" ? "front" : "photo";
+      w.classList.add("anim"); clearTimeout(w._t); w._t = setTimeout(() => w.classList.remove("anim"), 850);
+    };
+    w.onclick = flip;
+    w.onkeydown = e => { if ((e.key === "Enter" || e.key === " ") && e.target === w) { e.preventDefault(); flip(); } };
+    host.appendChild(w); showPhoto(photo, id);
+  });
+})();
 
 /* JADWAL KULIAH (Senin–Jumat) */
 const DAYS = ["Senin","Selasa","Rabu","Kamis","Jumat"];
