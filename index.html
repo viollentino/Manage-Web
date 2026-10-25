@@ -183,7 +183,7 @@ footer{max-width:1280px;width:100%;margin:auto;border-top:1px solid rgba(255,255
   #m-uang .hud-l>*,#m-uang .frame>*{order:3}
   #m-uang .h-tag,#m-uang .h-title,#m-uang .h-sub{order:0}
   #m-uang .stats,#m-uang .row-top{order:1;margin-bottom:0}
-  #m-uang .hud-l>.box{order:2}
+  #m-uang .hud-l>.addwrap{order:2}
 }
 
 /* HOBI */
@@ -220,6 +220,16 @@ footer{max-width:1280px;width:100%;margin:auto;border-top:1px solid rgba(255,255
 .hobby .pnav.prev{left:.5rem}.hobby .pnav.next{right:.5rem}
 .modal.open .hobby{animation:dropIn .9s cubic-bezier(.22,1,.36,1) both}
 .modal.open .hobby:nth-child(1){animation-delay:.6s}.modal.open .hobby:nth-child(2){animation-delay:.72s}.modal.open .hobby:nth-child(3){animation-delay:.84s}.modal.open .hobby:nth-child(4){animation-delay:.96s}.modal.open .hobby:nth-child(5){animation-delay:1.08s}.modal.open .hobby:nth-child(6){animation-delay:1.2s}
+
+/* TOMBOL TAMBAH (+) — form baru muncul setelah ditekan */
+.addbtn{display:flex;align-items:center;gap:.8rem;width:100%;padding:.65rem .9rem;border-radius:14px;border:1px dashed rgba(var(--acc-rgb),.6);background:rgba(var(--acc-rgb),.1);color:#fff;font:700 .8rem Montserrat,sans-serif;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;text-align:left;transition:background .3s,border-color .3s}
+.addbtn:hover{background:rgba(var(--acc-rgb),.2);border-color:var(--acc-text)}
+.addbtn .pl{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--acc);font:700 1.3rem/1 Montserrat,sans-serif;box-shadow:0 0 16px rgba(var(--acc-rgb),.5);transition:transform .45s cubic-bezier(.22,1,.36,1)}
+.addwrap.open .addbtn .pl{transform:rotate(45deg)}
+.addpanel{display:grid;grid-template-rows:0fr;opacity:0;visibility:hidden;transition:grid-template-rows .55s cubic-bezier(.22,1,.36,1),opacity .4s,visibility 0s linear .55s}
+.addwrap.open .addpanel{grid-template-rows:1fr;opacity:1;visibility:visible;transition:grid-template-rows .55s cubic-bezier(.22,1,.36,1),opacity .45s .08s,visibility 0s}
+.addin{min-height:0;overflow:hidden}
+.addin>.box{margin-top:.8rem}
 
 /* FORM */
 input[type=date],input[type=time],input[type=month]{min-width:0;max-width:100%;-webkit-appearance:none;appearance:none;display:block}
@@ -359,7 +369,8 @@ select.field option{background:#1a0a0c}
 .tagl{font-size:.72rem;font-weight:600;padding:.2rem .7rem;border-radius:8px;background:rgba(255,255,255,.07);border:1px solid var(--line)}
 .tagl.star{margin-left:auto;color:var(--warn)}
 .port-sec{margin-bottom:1.8rem}
-.port-sec .box.formbox{margin-bottom:1rem}
+.port-sec .box.formbox{margin-bottom:0}
+.port-sec .addwrap{margin-bottom:1rem}
 .mapcard{padding:0;overflow:hidden;display:flex;flex-direction:column;transition:transform .35s,box-shadow .35s}
 .mapcard:hover{transform:translateY(-4px);box-shadow:0 0 28px rgba(var(--acc-rgb),.35)}
 .thumb{position:relative;aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,rgba(var(--acc-rgb),.4),rgba(0,0,0,.65))}
@@ -377,10 +388,12 @@ select.field option{background:#1a0a0c}
 .modal.open .mapcard{animation:dropIn .9s cubic-bezier(.22,1,.36,1) both}
 
 /* JADWAL */
-.dtabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.4rem;margin-bottom:1rem}
-.dtabs button{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#e8e1e2;font-weight:600;font-size:.85rem;padding:.5rem .2rem;border-radius:999px;cursor:pointer;white-space:nowrap}
+.dtabs{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.4rem;margin-bottom:1rem}
+.dtabs button{position:relative;z-index:1;transition:color .3s;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#e8e1e2;font-weight:600;font-size:.85rem;padding:.5rem .2rem;border-radius:999px;cursor:pointer;white-space:nowrap}
 .dtabs button:hover{color:#fff}
-.dtabs button[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.dtabs button[aria-selected="true"]{background:transparent;border-color:transparent;color:#fff}
+/* kotak merah yang meluncur ke hari yang dipilih */
+.dtabs .dpill{position:absolute;left:0;top:0;z-index:0;border-radius:999px;background:var(--acc);box-shadow:0 6px 16px rgba(var(--acc-rgb),.4);pointer-events:none;transition:transform .5s cubic-bezier(.22,1,.36,1),width .5s cubic-bezier(.22,1,.36,1),height .5s,background .4s}
 .dtabs .s{display:none}
 @media(max-width:560px){.dtabs button{font-size:.74rem}.dtabs .f{display:none}.dtabs .s{display:inline}}
 .today{font-size:.72rem;font-weight:700;padding:.1rem .65rem;border-radius:999px;background:rgba(var(--acc-rgb),.2);color:var(--acc-text);margin-left:.5rem;text-transform:none}
@@ -553,14 +566,17 @@ body.in .gate{display:none}
     <div class="frame">
       <div class="t-grid">
         <div class="t-col">
-          <div class="box">
+          <div class="addwrap">
+<button class="addbtn" type="button" aria-expanded="false"><span class="pl" aria-hidden="true">+</span><span class="lbl">Tambah tugas</span></button>
+<div class="addpanel" inert><div class="addin">
+<div class="box">
             <h5>Tambah tugas baru</h5>
             <form class="form" id="todoForm" style="margin-bottom:0">
               <input class="field fl full" type="text" id="todoInput" placeholder="Tulis tugas baru…" maxlength="120" autocomplete="off" aria-label="Tugas">
               <label class="fl grow">Deadline<input class="field" type="date" id="todoDue"></label>
               <button class="submit" type="submit">TAMBAH (+)</button>
             </form>
-          </div>
+          </div></div></div></div>
           <ul id="todoList"></ul>
           <p class="empty" id="empty" hidden></p>
         </div>
@@ -585,7 +601,10 @@ body.in .gate{display:none}
       <p class="h-tag">[ 06 . FINANCE ]</p>
       <h3 class="h-title">KEUANGAN <em>PRIBADI</em></h3>
       <p class="h-sub">Pemasukan, pengeluaran, tabungan, dan ringkasan</p>
-      <div class="box">
+      <div class="addwrap">
+<button class="addbtn" type="button" aria-expanded="false"><span class="pl" aria-hidden="true">+</span><span class="lbl">Tambah transaksi</span></button>
+<div class="addpanel" inert><div class="addin">
+<div class="box">
         <h5>Tambah transaksi baru</h5>
         <form class="form" id="expForm" style="margin-bottom:0">
           <label class="fl sm">Jenis
@@ -611,7 +630,7 @@ body.in .gate{display:none}
           <label class="fl sm">Tanggal<input class="field" type="date" id="expDate"></label>
           <button class="submit wide" type="submit">TAMBAH TRANSAKSI (+)</button>
         </form>
-      </div>
+      </div></div></div></div>
       <div class="donuts" id="donuts"></div>
     </div>
     <div class="frame">
@@ -663,7 +682,10 @@ body.in .gate{display:none}
     <div class="frame">
       <div class="port-sec">
         <h4 class="h-head">🎮 Roblox Maps</h4>
-        <div class="box formbox">
+        <div class="addwrap">
+<button class="addbtn" type="button" aria-expanded="false"><span class="pl" aria-hidden="true">+</span><span class="lbl">Tambah map Roblox</span></button>
+<div class="addpanel" inert><div class="addin">
+<div class="box formbox">
           <h5>Tambah map Roblox</h5>
           <form class="form g2" id="mapForm">
             <label class="fl full">Nama map<input class="field" type="text" id="mapName" placeholder="Contoh: Obby Gunung Kediri" maxlength="60" autocomplete="off"></label>
@@ -672,7 +694,7 @@ body.in .gate{display:none}
             <label class="fl full">Foto / thumbnail<input class="field" type="file" id="mapPhoto" accept="image/*"></label>
             <button class="submit full" type="submit">TAMBAH MAP (+)</button>
           </form>
-        </div>
+        </div></div></div></div>
         <div class="projs" id="mapGrid"></div>
       </div>
       <h4 class="h-head">Proyek unggulan (GitHub)</h4>
@@ -689,7 +711,10 @@ body.in .gate{display:none}
       <p class="h-tag">[ 04 . SCHEDULE ]</p>
       <h3 class="h-title one">JADWAL <em>KULIAH</em></h3>
       <p class="h-sub">Mata kuliah, jam, ruang, dan gedung</p>
-      <div class="box">
+      <div class="addwrap">
+<button class="addbtn" type="button" aria-expanded="false"><span class="pl" aria-hidden="true">+</span><span class="lbl">Tambah jadwal</span></button>
+<div class="addpanel" inert><div class="addin">
+<div class="box">
         <h5>Tambah jadwal baru</h5>
         <form class="form g2" id="clsForm">
           <label class="fl full">Hari
@@ -702,7 +727,7 @@ body.in .gate{display:none}
           <label class="fl">Gedung<input class="field" type="text" id="clsBuilding" placeholder="Gedung A" maxlength="40" autocomplete="off"></label>
           <button class="submit full" type="submit">TAMBAH JADWAL (+)</button>
         </form>
-      </div>
+      </div></div></div></div>
     </div>
     <div class="frame">
       <h4 class="h-head">Jadwal mingguan &amp; detail hari</h4>
@@ -999,6 +1024,16 @@ const saveCls = () => { saveJSON(CLS_KEY, classes); pushCloud(); };
 const saveMaps = () => { saveJSON(MAP_KEY, maps); pushCloud(); };
 const saveHobi = () => { saveJSON(HOBI_KEY, hobiPics); pushCloud(); };
 
+/* TOMBOL TAMBAH (+) */
+function setAdd(w, open){
+  w.classList.toggle("open", open);
+  const p = w.querySelector(".addpanel"); if (open) p.removeAttribute("inert"); else p.setAttribute("inert", "");
+  w.querySelector(".addbtn").setAttribute("aria-expanded", open);
+  if (open) setTimeout(() => { const f = w.querySelector("input:not([type=file]):not([type=hidden])"); if (f && w.classList.contains("open")) f.focus({preventScroll:true}); }, 350);
+}
+document.querySelectorAll(".addwrap").forEach(w => w.querySelector(".addbtn").addEventListener("click", () => setAdd(w, !w.classList.contains("open"))));
+const closeAdd = form => { const w = form.closest(".addwrap"); if (w) setAdd(w, false); };
+
 /* TUGAS */
 const list = $("todoList"), input = $("todoInput"), dueInput = $("todoDue");
 const calTask = makeCal($("taskCal"), "Kalender tugas", () => {
@@ -1051,7 +1086,7 @@ function renderTasks(){
   $("taskRing").innerHTML = ringSVG(tasks.length ? done / tasks.length : 0, left, ["TERSISA"]);
   $("taskStat").innerHTML = `SELESAI: <b>${done}</b> | AKTIF: <b>${left}</b>`;
   const empty = $("empty");
-  if (!tasks.length) { empty.hidden = false; empty.textContent = "Belum ada tugas. Tulis satu di kolom atas."; }
+  if (!tasks.length) { empty.hidden = false; empty.textContent = "Belum ada tugas. Tekan tombol + untuk menambah."; }
   else if (!left) { empty.hidden = false; empty.textContent = "Semua tugas selesai. Kerja bagus!"; }
   else empty.hidden = true;
   calTask(); renderTaskChart();
@@ -1062,7 +1097,7 @@ $("todoForm").addEventListener("submit", e => {
   if (!text) { input.focus(); return; }
   tasks.push({text, done:false, due:dueInput.value || null});
   input.value = ""; dueInput.value = "";
-  saveTasks(); renderTasks(); toast("Tugas ditambahkan");
+  saveTasks(); renderTasks(); closeAdd($("todoForm")); toast("Tugas ditambahkan");
 });
 renderTasks();
 
@@ -1229,7 +1264,7 @@ function renderExp(){
   const view = $("expView"); view.innerHTML = "";
   const month = expenses.filter(x => x.date.startsWith(ym));
   renderCharts(ym, month);
-  if (!month.length) { view.appendChild(el("p", "empty", "Belum ada catatan di " + fmtMonth(ym) + ". Tambahkan lewat formulir di atas/samping.")); return; }
+  if (!month.length) { view.appendChild(el("p", "empty", "Belum ada catatan di " + fmtMonth(ym) + ". Tekan tombol + untuk menambah.")); return; }
   const byDate = {};
   month.forEach(x => (byDate[x.date] = byDate[x.date] || []).push(x));
   Object.keys(byDate).sort().reverse().forEach(d => {
@@ -1268,7 +1303,7 @@ $("expForm").addEventListener("submit", e => {
     target: isSave ? (Number($("expTarget").value) || 0) : 0});
   expNote.value = ""; expAmount.value = ""; $("expGoal").value = ""; $("expTarget").value = "";
   expMonth.value = date.slice(0, 7);
-  saveExp(); renderExp(); toast("Catatan ditambahkan"); expNote.focus();
+  saveExp(); renderExp(); closeAdd($("expForm")); toast("Catatan ditambahkan");
 });
 expMonth.onchange = () => { if (!expMonth.value) expMonth.value = todayISO().slice(0, 7); renderExp(); };
 renderExp();
@@ -1401,7 +1436,7 @@ async function setThumb(box, id){
 function renderMaps(){
   const g = $("mapGrid"); g.innerHTML = "";
   if (!maps.length) {
-    const p = el("p", "empty", "Belum ada map Roblox. Tambahkan map pertamamu lewat formulir di atas."); p.style.gridColumn = "1/-1"; g.appendChild(p); return;
+    const p = el("p", "empty", "Belum ada map Roblox. Tekan tombol + untuk menambah map pertamamu."); p.style.gridColumn = "1/-1"; g.appendChild(p); return;
   }
   maps.forEach((m, i) => {
     const card = el("article", "box mapcard"); card.style.animationDelay = (.6 + i * .1) + "s";
@@ -1439,7 +1474,7 @@ $("mapForm").addEventListener("submit", async e => {
   const id = "map" + Date.now();
   if (file) { try { await putImg(id, await shrink(file)); } catch { toast("Foto gagal dibaca, map disimpan tanpa foto"); } }
   maps.unshift({id, name, link, desc:$("mapDesc").value.trim()});
-  $("mapForm").reset(); saveMaps(); renderMaps(); toast("Map ditambahkan");
+  $("mapForm").reset(); saveMaps(); renderMaps(); closeAdd($("mapForm")); toast("Map ditambahkan");
 });
 renderMaps();
 
@@ -1538,8 +1573,20 @@ const calCls = makeCal($("clsCal"), "Kalender akademik", () => {
 });
 const RADAR = `<svg class="radar" viewBox="0 0 160 160" aria-hidden="true"><circle cx="80" cy="80" r="74"/><circle cx="80" cy="80" r="54"/><circle cx="80" cy="80" r="34"/><circle class="core" cx="80" cy="80" r="12"/><line x1="80" y1="6" x2="80" y2="154"/><line x1="6" y1="80" x2="154" y2="80"/><line x1="28" y1="28" x2="132" y2="132"/><line x1="132" y1="28" x2="28" y2="132"/><path class="sw" d="M80 80 L80 6 A74 74 0 0 1 132 28 Z"/></svg>`;
 
+function placeDayPill(instant){
+  const tabs = $("dayTabs"), pill = tabs.querySelector(".dpill"), b = tabs.querySelector('[aria-selected="true"]');
+  if (!pill || !b) return;
+  const snap = instant || !pill.dataset.on;
+  if (snap) pill.style.transition = "none";
+  pill.style.width = b.offsetWidth + "px"; pill.style.height = b.offsetHeight + "px";
+  pill.style.transform = `translate(${b.offsetLeft}px,${b.offsetTop}px)`;
+  if (snap) { pill.offsetWidth; pill.style.transition = ""; pill.dataset.on = "1"; }
+}
 function renderSchedule(){
-  const tabs = $("dayTabs"); tabs.innerHTML = "";
+  const tabs = $("dayTabs");
+  let dpill = tabs.querySelector(".dpill");
+  if (!dpill) { dpill = el("span", "dpill"); dpill.setAttribute("aria-hidden", "true"); tabs.appendChild(dpill); }
+  tabs.querySelectorAll("button").forEach(x => x.remove());
   DAYS.forEach((d, i) => {
     const n = classes.filter(c => c.day === d).length;
     const b = el("button"); b.type = "button"; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", i === activeDay);
@@ -1548,6 +1595,7 @@ function renderSchedule(){
     b.onclick = () => { activeDay = i; $("clsDay").value = d; renderSchedule(); };
     tabs.appendChild(b);
   });
+  placeDayPill(false);
   const ttl = $("dayTitle"); ttl.textContent = "Jadwal hari " + DAYS[activeDay];
   if (activeDay === todayIdx) ttl.appendChild(el("span", "today", "Hari ini"));
   const panel = $("dayPanel"); panel.innerHTML = "";
@@ -1555,7 +1603,7 @@ function renderSchedule(){
   if (!items.length) {
     const w = el("div", "empty-radar");
     const rd = el("div", "rd"); rd.innerHTML = RADAR; rd.appendChild(document.createTextNode("0 kuliah aktif / hari kosong"));
-    w.append(rd, el("p", "", "Belum ada kuliah di hari " + DAYS[activeDay] + ". Tambahkan lewat formulir."));
+    w.append(rd, el("p", "", "Belum ada kuliah di hari " + DAYS[activeDay] + ". Tekan tombol + untuk menambah."));
     panel.appendChild(w);
   } else items.forEach(c => {
     const row = el("div", "box class");
@@ -1580,9 +1628,11 @@ $("clsForm").addEventListener("submit", e => {
   classes.push({id:Date.now() + Math.random(), day, name, start, end, room:$("clsRoom").value.trim(), building:$("clsBuilding").value.trim()});
   ["clsName","clsRoom","clsBuilding"].forEach(i => $(i).value = "");
   activeDay = DAYS.indexOf(day);
-  saveCls(); renderSchedule(); toast("Jadwal ditambahkan"); $("clsName").focus();
+  saveCls(); renderSchedule(); closeAdd($("clsForm")); toast("Jadwal ditambahkan");
 });
 renderSchedule();
+addEventListener("resize", () => placeDayPill(true)); addEventListener("load", () => placeDayPill(true));
+if (document.fonts) document.fonts.ready.then(() => placeDayPill(true));
 
 /* LOGIN + FIREBASE */
 const firebaseConfig = {
