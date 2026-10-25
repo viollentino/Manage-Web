@@ -97,6 +97,10 @@ footer{max-width:1280px;width:100%;margin:auto;border-top:1px solid rgba(255,255
 .pscroll{height:100%;overflow-y:auto;overflow-x:hidden;padding:5.2rem 1rem calc(2.4rem + env(safe-area-inset-bottom,0px));display:flex}
 .pscroll>*{max-width:1000px;margin:auto;width:100%;min-width:0}
 @media(min-width:900px){.pscroll{padding:5.5rem 2rem 3rem}}
+/* pindah antar menu: panel langsung tampil, isinya hanya memudar tipis */
+.modal.nt,.modal.nt.open{transition:none!important}
+@keyframes swapIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.modal.open.sw :is(.ab-left>*,.ab-right>*,.hud-l>*,.frame,.hobby,.mapcard){animation:swapIn .35s ease both!important}
 @keyframes dropIn{from{opacity:0;transform:translateY(-34px)}to{opacity:1;transform:none}}
 .modal.open .ab-left>*,.modal.open .ab-right>*{animation:dropIn 1.05s cubic-bezier(.22,1,.36,1) both}
 .modal.open .ab-left>*:nth-child(2){animation-delay:.15s}.modal.open .ab-left>*:nth-child(3){animation-delay:.27s}.modal.open .ab-left>*:nth-child(4){animation-delay:.39s}.modal.open .ab-left>*:nth-child(5){animation-delay:.51s}
@@ -108,7 +112,12 @@ footer{max-width:1280px;width:100%;margin:auto;border-top:1px solid rgba(255,255
 .mtop .logo span{color:var(--acc)}
 .mtop nav{display:flex;gap:.3rem;font:600 .72rem Montserrat,sans-serif;letter-spacing:.08em}
 .mtop nav button{background:none;color:#a9a0a1;padding:.5rem .85rem;border-radius:12px;border:0;cursor:pointer;transition:background .4s,transform .4s,color .4s,box-shadow .4s}
-.mtop nav button:hover,.mtop nav button.on{background:var(--acc);color:#fff;transform:translateY(-2px);box-shadow:0 8px 18px rgba(var(--acc-rgb),.4)}
+.mtop nav{position:relative}
+.mtop nav button{position:relative;z-index:1}
+.mtop nav button:hover{background:rgba(255,255,255,.08);color:#fff}
+.mtop nav button.on,.mtop nav button.on:hover{background:none;color:#fff}
+/* kotak merah yang meluncur ke menu aktif */
+.mtop nav .pill{position:absolute;left:0;top:0;z-index:0;border-radius:12px;background:var(--acc);box-shadow:0 8px 18px rgba(var(--acc-rgb),.4);pointer-events:none;transition:transform .5s cubic-bezier(.22,1,.36,1),width .5s cubic-bezier(.22,1,.36,1),height .5s,background .4s}
 @media(max-width:900px){.mtop nav{display:none}}
 
 /* CARD */
@@ -779,18 +788,38 @@ document.querySelectorAll(".panel").forEach(p => {
   const brand = el("a", "logo"); brand.href = "#top"; brand.setAttribute("data-close", "");
   brand.innerHTML = "<span>VIO</span>LLEN";
   const nav = el("nav");
+  nav.appendChild(el("span", "pill"));
   NAVS.forEach(([t, label]) => { const b = el("button", t === id ? "on" : "", label); b.type = "button"; b.dataset.open = t; nav.appendChild(b); });
   top.append(brand, nav); p.appendChild(top);
 });
+function setPill(modal, target, animate){
+  const nav = modal.querySelector(".mtop nav"), pill = nav && nav.querySelector(".pill"), btn = nav && nav.querySelector(`button[data-open="${target}"]`);
+  if (!pill || !btn) return;
+  if (!animate) pill.style.transition = "none";
+  pill.style.width = btn.offsetWidth + "px"; pill.style.height = btn.offsetHeight + "px";
+  pill.style.transform = `translate(${btn.offsetLeft}px,${btn.offsetTop}px)`;
+  if (!animate) { pill.offsetWidth; pill.style.transition = ""; }
+}
+function placePills(){ document.querySelectorAll(".modal").forEach(m => setPill(m, m.id, false)); }
+placePills(); addEventListener("resize", placePills); addEventListener("load", placePills);
+if (document.fonts) document.fonts.ready.then(placePills);
 let lastFocus = null;
 function openModal(id){
-  document.querySelectorAll(".modal.open").forEach(m => m.classList.remove("open"));
-  lastFocus = document.activeElement;
-  const m = $(id);
+  const m = $(id), cur = document.querySelector(".modal.open");
+  if (cur === m) return;
+  const switching = !!cur;
+  if (!switching) lastFocus = document.activeElement;
+  document.querySelectorAll(".modal.open").forEach(x => { if (switching) x.classList.add("nt"); x.classList.remove("open", "sw"); });
   const sc = m.querySelector(".pscroll"); if (sc) sc.scrollTop = 0;
+  if (switching) { m.classList.add("nt", "sw"); setPill(m, cur.id, false); }
+  else { m.classList.remove("sw"); setPill(m, id, false); }
   m.classList.add("open");
   document.body.style.overflow = "hidden";
   $("mobile").classList.remove("open");
+  if (switching) {
+    m.offsetWidth; setPill(m, id, true);
+    setTimeout(() => document.querySelectorAll(".modal.nt").forEach(x => x.classList.remove("nt")), 90);
+  }
   const first = m.querySelector("button.x"); if (first) first.focus({preventScroll:true});
 }
 function closeModals(){ document.querySelectorAll(".modal.open").forEach(m => m.classList.remove("open")); document.body.style.overflow = ""; if (lastFocus) lastFocus.focus(); }
