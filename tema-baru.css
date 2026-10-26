@@ -13,7 +13,7 @@
 
 /* ---------- Dasar: tanpa gradien, tanpa kaca, tanpa partikel ---------- */
 body{background:var(--sky) var(--contour);background-attachment:fixed;color:var(--ink)}
-#bg,.smoke,#embers{display:none!important}
+body.in .smoke{opacity:.55}
 .glass,body .panel.glass{background:var(--sky2);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
 body .panel,body .panel.glass{background:var(--sky) var(--contour)}
 body .mobile.glass{background:transparent}
@@ -44,10 +44,10 @@ body .h-sub{color:var(--muted)}
 /* ---------- Nav ---------- */
 .nav{background:var(--sky2);backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:12px;box-shadow:none;border:1px solid var(--line)}
 .links button{font-size:.92rem;font-weight:500;color:var(--muted);border-radius:8px}
-.links button:hover{background:var(--sky3);color:var(--ink);transform:none;box-shadow:none}
+.links button:hover{background:var(--sky3);color:var(--ink);transform:translateY(-2px);box-shadow:none}
 .btn{font-size:.9rem;font-weight:600;border-radius:8px}
 .btn.red{background:var(--acc);color:var(--on-acc);box-shadow:none}
-.btn.red:hover{box-shadow:none;transform:none;filter:brightness(1.1)}
+.btn.red:hover{box-shadow:0 0 22px rgba(var(--acc-rgb),.45);transform:translateY(-2px);filter:brightness(1.08)}
 .btn.ghost{background:var(--sky3)}
 .mobile button{font-size:.95rem;color:var(--ink)}
 
@@ -55,14 +55,15 @@ body .h-sub{color:var(--muted)}
 main{background:transparent}
 main::after{background:linear-gradient(transparent,var(--sky))}
 .name{font-family:var(--f-head);font-weight:800;text-transform:none;letter-spacing:-.04em}
-.name span{transform:none;background:none;color:var(--ink);-webkit-text-fill-color:var(--ink)}
-body.in .name span{animation:none}
-body.in .hero-obj{animation:heroIn 1.9s cubic-bezier(.22,1,.36,1) .5s both}
-body.in .nav,body.in .social{animation:none}
+.name span{transform:none;color:transparent;-webkit-text-fill-color:transparent;background-image:linear-gradient(100deg,var(--ink) 0%,var(--ink) 42%,var(--acc) 50%,var(--ink) 58%,var(--ink) 100%);background-size:300% 100%;background-position:100% 0;background-repeat:no-repeat;-webkit-background-clip:text;background-clip:text}
+body.in .name span{animation:sweep2 7s ease-in-out 2.6s infinite}
+@keyframes sweep2{0%,15%{background-position:100% 0}60%,100%{background-position:0% 0}}
 .social{background:var(--sky2);backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:12px}
 .sbtn{border-radius:8px}
-.sbtn:hover{background:var(--acc);transform:none}
+.sbtn:hover{background:var(--acc);transform:translateY(-3px)}
 .sbtn:hover svg{fill:var(--on-acc)}
+.box,.task,.chip,.addbtn{transition:border-color .3s,background .3s,transform .3s}
+.task:hover{transform:translateX(4px);border-color:var(--acc)}
 footer{color:var(--muted)}
 
 /* ---------- Modal ---------- */
@@ -73,14 +74,12 @@ footer{color:var(--muted)}
 .mtop nav .pill{background:var(--acc);box-shadow:none;border-radius:8px}
 .x{border-radius:8px;background:var(--sky3)}
 
-/* Isi modal muncul langsung, tanpa animasi bertingkat */
-body .modal.open :is(.ab-left>*,.ab-right>*,.hud-l>*,.frame,.frame>*,.hobby,.mapcard){animation:none!important}
 
 /* ---------- Kartu: lebih datar, radius dibedakan ---------- */
 .box{background:var(--sky2);border:1px solid var(--line);border-radius:10px;box-shadow:none}
 .box>h5{font-size:1rem;font-weight:600}
-.proj,.mapcard{transition:border-color .25s}
-.proj:hover,.mapcard:hover{transform:none;box-shadow:none;border-color:var(--acc)}
+.proj,.mapcard{transition:transform .35s,border-color .25s,box-shadow .35s}
+.proj:hover,.mapcard:hover{transform:translateY(-5px);box-shadow:0 14px 30px rgba(0,0,0,.35);border-color:var(--acc)}
 .mapcard{border-radius:12px}
 .pill,.tagl{border-radius:6px}
 .stat strong{font-weight:700}
