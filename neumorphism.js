@@ -49,7 +49,7 @@ body.in .smoke{opacity:.3}
 main{background:transparent}
 main::after{background:linear-gradient(transparent,var(--nb))}
 .name span{background-image:none;-webkit-background-clip:border-box;background-clip:border-box;-webkit-text-fill-color:var(--nameC);color:var(--nameC);text-shadow:6px 8px 14px var(--nsd),-5px -5px 12px var(--nsl)}
-html[data-mode=dark] .hero-obj{filter:drop-shadow(0 0 26px rgba(var(--acc-rgb),.5))}
+html[data-mode=dark] .hero-obj{filter:none}
 html[data-mode=light] .hero-obj{filter:drop-shadow(0 16px 22px var(--nsd))}
 .social{background:var(--nb);border:0;box-shadow:var(--r);backdrop-filter:none;-webkit-backdrop-filter:none}
 .sbtn{background:var(--nb);color:var(--nt);box-shadow:var(--rx)}
