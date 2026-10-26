@@ -426,7 +426,6 @@ body.in .gate{display:none}
 .toast.show{transform:none;opacity:1}
 </style>
 <link rel="stylesheet" href="tema-baru.css">
-<script src="neumorphism.js" defer></script>
 </head>
 <body>
 
@@ -866,10 +865,10 @@ $("burger").onclick = () => $("mobile").classList.toggle("open");
 
 /* TEMA & LATAR — satu warna aksen mengatur semuanya (termasuk gradien VIOLLENTINO) */
 const THEMES = {
-  maroon:  {acc:"#e50914", rgb:"229,9,20",  text:"#ff6b72", b1:"#080203", b2:"#630a10", b3:"#120305", g:["74,4,8","142,10,18","208,24,34"],   name:"Maroon"},
-  emerald: {acc:"#059669", rgb:"5,150,105",  text:"#34d399", b1:"#02120a", b2:"#064e3b", b3:"#02180e", g:["3,48,31","4,120,87","16,185,129"],  name:"Hijau"},
-  purple:  {acc:"#7c3aed", rgb:"124,58,237", text:"#a78bfa", b1:"#0d0212", b2:"#4c1d95", b3:"#14041e", g:["46,16,101","91,33,182","139,92,246"], name:"Ungu"},
-  blue:    {acc:"#2563eb", rgb:"37,99,235",  text:"#60a5fa", b1:"#020712", b2:"#12317a", b3:"#040b1c", g:["11,31,92","29,78,216","59,130,246"],  name:"Biru"}
+  glacier: {acc:"#7cc4e8", rgb:"124,196,232", text:"#7cc4e8", b1:"#15202a", b2:"#1b2936", b3:"#15202a", g:["0,0,0","0,0,0","0,0,0"], name:"Biru es"},
+  moss:    {acc:"#a3c46a", rgb:"163,196,106", text:"#a3c46a", b1:"#15202a", b2:"#1b2936", b3:"#15202a", g:["0,0,0","0,0,0","0,0,0"], name:"Lumut"},
+  sunrise: {acc:"#f2a65a", rgb:"242,166,90",  text:"#f2a65a", b1:"#15202a", b2:"#1b2936", b3:"#15202a", g:["0,0,0","0,0,0","0,0,0"], name:"Fajar"},
+  lilac:   {acc:"#b7a4f2", rgb:"183,164,242", text:"#b7a4f2", b1:"#15202a", b2:"#1b2936", b3:"#15202a", g:["0,0,0","0,0,0","0,0,0"], name:"Lilac"}
 };
 function rgb2hsl(r, g, b){
   r /= 255; g /= 255; b /= 255;

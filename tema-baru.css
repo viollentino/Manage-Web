@@ -1,0 +1,130 @@
+/* Tema baru: peta kontur, langit malam di gunung.
+   Taruh SETELAH </style> utama. Semua fungsi JS tetap jalan. */
+:root{
+  --sky:#15202a;--sky2:#1b2936;--sky3:#243445;
+  --ink:#e9eef1;--on-acc:#0b1620;
+  --muted:#9fb0ba;--line:rgba(190,215,230,.16);
+  --ok:#8fd19e;--info:#8ab8ff;--warn:#e8c26e;--bad:#ff8f86;
+  --acc:#7cc4e8;--acc-rgb:124,196,232;--acc-text:#7cc4e8;
+  --f-head:"Bricolage Grotesque","Public Sans",system-ui,sans-serif;
+  --f-body:"Public Sans",system-ui,sans-serif;
+  --contour:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='360' viewBox='0 0 520 360' fill='none' stroke='%23bcd7e6' stroke-opacity='.07'%3E%3Cpath d='M60 190c10-70 90-120 170-110s150 50 160 120-50 130-140 140S50 270 60 190z'/%3E%3Cpath d='M105 190c8-48 66-84 126-76s108 38 116 88-34 94-100 102-150-34-142-114z'/%3E%3Cpath d='M150 192c6-28 44-50 84-44s68 24 72 56-24 58-68 62-94-22-88-74z'/%3E%3Cpath d='M195 196c4-12 22-22 40-18s30 12 30 26-14 26-34 28-40-10-36-36z'/%3E%3C/svg%3E");
+}
+
+/* ---------- Dasar: tanpa gradien, tanpa kaca, tanpa partikel ---------- */
+body{background:var(--sky) var(--contour);background-attachment:fixed;color:var(--ink)}
+#bg,.smoke,#embers{display:none!important}
+.glass,body .panel.glass{background:var(--sky2);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
+body .panel,body .panel.glass{background:var(--sky) var(--contour)}
+body .mobile.glass{background:transparent}
+
+/* Font: tiap aturan lama memakai shorthand, jadi dipaksa ulang di sini */
+body *:not(.zz){font-family:var(--f-body)}
+body :is(h1,h2,h3,h4,h5,.brand b,.mtop .logo,.stat strong,.ring .rbig,.gstats b,.proj .pn):not(.zz){font-family:var(--f-head)}
+
+/* Huruf kapital semua diganti kalimat biasa */
+body :is(.links button,.mtop nav button,.mobile button,.submit,.ab-title,.h-title,.brand b,.mtop .logo){text-transform:lowercase}
+body :is(.links button,.mtop nav button,.mobile button,.submit,.ab-title,.h-title,.brand b,.mtop .logo)::first-letter{text-transform:uppercase}
+body :is(.brand small,.ab-item small,.ab-item strong,.ab-dl,.box>h5,.cal-head,.cal-grid .dow,.task label,.addbtn,.stack .sh,.hobby .tap,.hobby .pcap,.cap,.hud-deco,.form.g2 .fl,.empty-radar .rd,.h-head,.mbody h4,.proj h4,.nav .btn,.btn){text-transform:none;letter-spacing:0}
+body .brand b i{display:none}
+body .brand b{display:block;font-size:1.25rem;font-weight:700}
+body .brand small{padding-left:0;font-size:.72rem}
+body .mtop .logo{display:inline-block;font-size:1.3rem;font-weight:700;letter-spacing:0}
+body .mtop .logo span{color:inherit}
+
+/* Hilangkan label teknis, penomoran, dan hiasan yang tidak memberi informasi */
+.ab-tag,.h-tag,.hud-deco,.hud-panel::after,.hobby .no,.task .tno{display:none!important}
+
+/* Judul: satu warna, tidak ada satu kata yang diwarnai */
+body :is(.ab-title,.h-title){font-weight:700;letter-spacing:-.02em;line-height:1.05}
+body :is(.ab-title span,.h-title em){display:inline;color:inherit;text-shadow:none;font-style:normal}
+body .h-sub{color:var(--muted)}
+.hl{color:var(--acc-text)}
+
+/* ---------- Nav ---------- */
+.nav{background:var(--sky2);backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:12px;box-shadow:none;border:1px solid var(--line)}
+.links button{font-size:.92rem;font-weight:500;color:var(--muted);border-radius:8px}
+.links button:hover{background:var(--sky3);color:var(--ink);transform:none;box-shadow:none}
+.btn{font-size:.9rem;font-weight:600;border-radius:8px}
+.btn.red{background:var(--acc);color:var(--on-acc);box-shadow:none}
+.btn.red:hover{box-shadow:none;transform:none;filter:brightness(1.1)}
+.btn.ghost{background:var(--sky3)}
+.mobile button{font-size:.95rem;color:var(--ink)}
+
+/* ---------- Hero ---------- */
+main{background:transparent}
+main::after{background:linear-gradient(transparent,var(--sky))}
+.name{font-family:var(--f-head);font-weight:800;text-transform:none;letter-spacing:-.04em}
+.name span{transform:none;background:none;color:var(--ink);-webkit-text-fill-color:var(--ink)}
+body.in .name span{animation:none}
+body.in .hero-obj{animation:heroIn 1.9s cubic-bezier(.22,1,.36,1) .5s both}
+body.in .nav,body.in .social{animation:none}
+.social{background:var(--sky2);backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:12px}
+.sbtn{border-radius:8px}
+.sbtn:hover{background:var(--acc);transform:none}
+.sbtn:hover svg{fill:var(--on-acc)}
+footer{color:var(--muted)}
+
+/* ---------- Modal ---------- */
+.mtop{background:var(--sky2);backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:1px solid var(--line)}
+.mtop nav button{font-size:.9rem;font-weight:500;color:var(--muted);border-radius:8px}
+.mtop nav button:hover{background:var(--sky3);color:var(--ink)}
+.mtop nav button.on,.mtop nav button.on:hover{background:none;color:var(--on-acc)}
+.mtop nav .pill{background:var(--acc);box-shadow:none;border-radius:8px}
+.x{border-radius:8px;background:var(--sky3)}
+
+/* Isi modal muncul langsung, tanpa animasi bertingkat */
+body .modal.open :is(.ab-left>*,.ab-right>*,.hud-l>*,.frame,.frame>*,.hobby,.mapcard){animation:none!important}
+
+/* ---------- Kartu: lebih datar, radius dibedakan ---------- */
+.box{background:var(--sky2);border:1px solid var(--line);border-radius:10px;box-shadow:none}
+.box>h5{font-size:1rem;font-weight:600}
+.proj,.mapcard{transition:border-color .25s}
+.proj:hover,.mapcard:hover{transform:none;box-shadow:none;border-color:var(--acc)}
+.mapcard{border-radius:12px}
+.pill,.tagl{border-radius:6px}
+.stat strong{font-weight:700}
+
+/* ---------- Form ---------- */
+.field{background:var(--sky);border-radius:8px}
+select.field option{background:var(--sky2)}
+.submit{background:var(--acc);color:var(--on-acc);border-radius:8px;box-shadow:none;font-size:.9rem}
+input[type=file]::file-selector-button{color:var(--on-acc)}
+.addbtn{background:transparent;border:1px dashed var(--acc);border-radius:10px;font-size:.9rem;font-weight:600}
+.addbtn:hover{background:var(--sky2);border-color:var(--acc)}
+.addbtn .pl{background:var(--acc);color:var(--on-acc);box-shadow:none}
+.chip{background:var(--sky);border-color:var(--line);color:var(--muted)}
+.chip:hover{background:var(--sky3);border-color:var(--acc);color:var(--ink)}
+.extra{background:var(--sky);border-color:var(--line);border-style:solid}
+
+/* ---------- Tugas, hobi, jadwal ---------- */
+.task{background:var(--sky2);border-radius:10px}
+.task label{font-weight:500;font-size:.95rem}
+.hobby .hc{background:var(--sky2)}
+.hobby .ic{stroke:var(--acc);filter:none}
+.hobby .pph{background:var(--sky3)}
+.hobby .pup:hover,.hobby .pnav:hover{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.chg:hover{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.ring .rv{filter:none}
+.ring .rlab{fill:var(--muted)}
+.cal-grid .d{border-radius:6px}
+.cal-grid .d.today,#clsCal .d.today{background:var(--acc);color:var(--on-acc)}
+.cal-grid .d.mark{background:var(--sky3)}
+#clsCal .d{border-radius:6px}
+#clsCal .d.mark{background:var(--sky3);box-shadow:0 0 0 1px var(--acc) inset}
+.dtabs button{border-radius:8px;background:var(--sky2);border-color:var(--line)}
+.dtabs button[aria-selected="true"]{color:var(--on-acc)}
+.dtabs .dpill{background:var(--acc);box-shadow:none;border-radius:8px}
+.class{border-left:3px solid var(--acc);border-radius:8px}
+.today{border-radius:6px;background:var(--sky3)}
+.gbar i{background:var(--acc)}
+.ggrid i.on{background:var(--acc)}
+
+/* ---------- Login & toast ---------- */
+.gate{background:var(--sky) var(--contour)}
+.gate-card{border:1px solid var(--line);border-radius:14px}
+.toast{border-color:var(--line);border-radius:8px}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
