@@ -576,8 +576,7 @@ body.in .gate{display:none}
 <div class="box">
             <h5>Tambah tugas baru</h5>
             <form class="form" id="todoForm" style="margin-bottom:0">
-              <input class="field fl full" type="text" id="todoInput" placeholder="Tulis tugas baru…" maxlength="120" autocomplete="off" aria-label="Tugas">
-              <div class="fl full"><span>Mata kuliah (pilih dari jadwal)</span>
+              <div class="fl full"><span>Mapel (pilih dari jadwal)</span>
                 <div class="chips" id="subjChips"></div>
                 <input class="field" type="text" id="todoSubject" placeholder="Atau ketik mapel sendiri…" maxlength="60" autocomplete="off">
               </div>
@@ -1046,7 +1045,7 @@ document.querySelectorAll(".addwrap").forEach(w => w.querySelector(".addbtn").ad
 const closeAdd = form => { const w = form.closest(".addwrap"); if (w) setAdd(w, false); };
 
 /* TUGAS */
-const list = $("todoList"), input = $("todoInput"), dueInput = $("todoDue");
+const list = $("todoList"), dueInput = $("todoDue");
 const subjInput = $("todoSubject"), noteInput = $("todoNote");
 function subjectList(){
   return [...new Set(classes.map(c => (c.name || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "id"));
@@ -1103,7 +1102,7 @@ function renderTasks(){
     const label = el("label", "", t.text); label.htmlFor = cb.id;
     const info = dueInfo(t);
     body.append(label);
-    if (t.subject) body.appendChild(el("span", "pill save", t.subject));
+    if (t.subject && t.subject !== t.text) body.appendChild(el("span", "pill save", t.subject));
     body.appendChild(el("span", "pill " + info.cls, info.label));
     if (t.note) body.appendChild(el("small", "tnote", t.note));
     const del = el("button", "del", "×"); del.type = "button"; del.setAttribute("aria-label", "Hapus tugas");
@@ -1122,10 +1121,10 @@ function renderTasks(){
 }
 $("todoForm").addEventListener("submit", e => {
   e.preventDefault();
-  const text = input.value.trim();
-  if (!text) { input.focus(); return; }
-  tasks.push({text, done:false, due:dueInput.value || null, subject:subjInput.value.trim(), note:noteInput.value.trim()});
-  input.value = ""; dueInput.value = ""; subjInput.value = ""; noteInput.value = "";
+  const text = subjInput.value.trim();
+  if (!text) { toast("Pilih atau isi mapel dulu"); subjInput.focus(); return; }
+  tasks.push({text, done:false, due:dueInput.value || null, subject:text, note:noteInput.value.trim()});
+  dueInput.value = ""; subjInput.value = ""; noteInput.value = "";
   renderSubjectChips();
   saveTasks(); renderTasks(); closeAdd($("todoForm")); toast("Tugas ditambahkan");
 });
