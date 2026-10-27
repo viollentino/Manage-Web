@@ -354,7 +354,6 @@ textarea.field{resize:vertical;min-height:64px;font-family:inherit}
 .fin-play .gbar i{animation:gx 1.1s cubic-bezier(.22,1,.36,1) both;animation-delay:var(--base,.5s)}
 .fin-play .dmask{animation:dsweep 1.3s cubic-bezier(.4,0,.2,1) both;animation-delay:var(--base,.5s)}
 .fin-play .donut-wrap svg{animation:dspin 1.4s cubic-bezier(.22,1,.36,1) both;animation-delay:var(--base,.5s)}
-@media(prefers-reduced-motion:reduce){.fin-play .chart-svg .bar,.fin-play .gbar i,.fin-play .dmask,.fin-play .donut-wrap svg{animation:none!important}}
 
 /* PORTOFOLIO */
 .gh-card{display:grid;gap:.9rem}
@@ -1315,7 +1314,6 @@ function scrambleEl(e, dur = 1300){
   })(t0);
 }
 function playFinanceAnim(){
-  if (matchMedia("(prefers-reduced-motion:reduce)").matches) return;
   const m = $("m-uang");
   m.classList.remove("fin-play"); void m.offsetWidth; m.classList.add("fin-play");
   ["sIn","sOut","sSave","sCash"].forEach(id => scrambleEl($(id)));
