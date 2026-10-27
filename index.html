@@ -508,16 +508,6 @@ body.out .gate{display:grid}
     </div>
   </main>
 
-  <footer>
-    <p>© <span id="year"></span> Adyatama Prawisa Viollentino. Semua hak dilindungi.</p>
-    <div class="themes"><span>Warna aksen:</span>
-      <button style="background:#e50914" data-theme="maroon" title="Maroon" aria-label="Tema maroon"></button>
-      <button style="background:#059669" data-theme="emerald" title="Hijau" aria-label="Tema hijau"></button>
-      <button style="background:#7c3aed" data-theme="purple" title="Ungu" aria-label="Tema ungu"></button>
-      <button style="background:#2563eb" data-theme="blue" title="Biru" aria-label="Tema biru"></button>
-      <label class="custom" title="Warna kustom"><input type="color" id="customColor" value="#e50914" aria-label="Pilih warna aksen sendiri"></label>
-    </div>
-  </footer>
 </div>
 
 <!-- TENTANG -->
@@ -781,7 +771,6 @@ document.querySelectorAll("[data-social]").forEach(a => a.href = SOCIAL[a.datase
 $d=document.getElementById("btnDiscord");
 $d.onclick=()=>{const u="lennn7127";const ok=()=>toast("Username Discord disalin: "+u);
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(ok,()=>toast("Discord: "+u));else toast("Discord: "+u);};
-document.getElementById("year").textContent = new Date().getFullYear();
 
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, "0");
@@ -917,13 +906,9 @@ function setTheme(k, quiet){
   r.setProperty("--bg1", t.b1); r.setProperty("--bg2", t.b2); r.setProperty("--bg3", t.b3);
   r.setProperty("--g1r", t.g[0]); r.setProperty("--g2r", t.g[1]); r.setProperty("--g3r", t.g[2]);
   $("metaTheme").setAttribute("content", t.b1);
-  if (k.startsWith("custom:")) $("customColor").value = k.slice(7);
   saveJSON("tema-profil", k);
   if (!quiet) toast("Tema " + t.name + " aktif");
 }
-document.querySelectorAll("[data-theme]").forEach(b => b.onclick = () => setTheme(b.dataset.theme));
-$("customColor").addEventListener("input", e => setTheme("custom:" + e.target.value, true));
-$("customColor").addEventListener("change", e => setTheme("custom:" + e.target.value));
 setTheme(loadJSON("tema-profil", "maroon"), true);
 (function(){
   const c = $("bg"), x = c.getContext("2d");
