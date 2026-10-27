@@ -343,6 +343,19 @@ textarea.field{resize:vertical;min-height:64px;font-family:inherit}
 .key{display:flex;gap:1rem;font-size:.74rem;color:var(--muted);margin-bottom:.4rem;flex-wrap:wrap}
 .key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:.35rem}
 
+/* ANIMASI KEUANGAN (diputar saat menu dibuka) */
+.chart-svg .bar{transform-box:fill-box;transform-origin:50% 100%}
+.gbar i{transform-origin:left center}
+@keyframes barUp{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes gx{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes dsweep{from{stroke-dashoffset:var(--C)}to{stroke-dashoffset:0}}
+@keyframes dspin{from{transform:rotate(-120deg);opacity:0}30%{opacity:1}to{transform:rotate(0);opacity:1}}
+.fin-play .chart-svg .bar{animation:barUp .9s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--base,.5s) + var(--d,0s))}
+.fin-play .gbar i{animation:gx 1.1s cubic-bezier(.22,1,.36,1) both;animation-delay:var(--base,.5s)}
+.fin-play .dmask{animation:dsweep 1.3s cubic-bezier(.4,0,.2,1) both;animation-delay:var(--base,.5s)}
+.fin-play .donut-wrap svg{animation:dspin 1.4s cubic-bezier(.22,1,.36,1) both;animation-delay:var(--base,.5s)}
+@media(prefers-reduced-motion:reduce){.fin-play .chart-svg .bar,.fin-play .gbar i,.fin-play .dmask,.fin-play .donut-wrap svg{animation:none!important}}
+
 /* PORTOFOLIO */
 .gh-card{display:grid;gap:.9rem}
 .gh-top{display:grid;gap:.5rem}
@@ -857,6 +870,7 @@ function openModal(id){
   if (switching) { m.classList.add("nt", "sw"); setPill(m, cur.id, false); }
   else { m.classList.remove("sw"); setPill(m, id, false); }
   m.classList.add("open");
+  if (id === "m-uang") playFinanceAnim();
   document.body.style.overflow = "hidden";
   $("mobile").classList.remove("open");
   if (switching) {
@@ -1197,18 +1211,20 @@ function groupSum(items, keyFn){
 }
 const short = n => n >= 1e6 ? (n/1e6).toFixed(n % 1e6 ? 1 : 0) + "jt" : n >= 1e3 ? Math.round(n/1e3) + "rb" : String(Math.round(n));
 
+let dgid = 0;
 function donutBox(title, data){
   const box = el("div", "box"); box.appendChild(el("h5", "", title));
   if (!data.length) { box.appendChild(el("p", "empty", "Belum ada data.")); return box; }
   const total = data.reduce((s, d) => s + d.val, 0), R = 52, C = 2 * Math.PI * R;
   let off = 0, arcs = "";
+  const mid = "dm" + (++dgid);
   data.forEach((d, i) => {
     const len = d.val / total * C;
     arcs += `<circle cx="70" cy="70" r="${R}" fill="none" stroke="${PAL[i % PAL.length]}" stroke-width="22" stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-off}" transform="rotate(-90 70 70)"/>`;
     off += len;
   });
   const w = el("div", "donut-wrap");
-  w.innerHTML = `<svg viewBox="0 0 140 140" role="img" aria-label="${title}">${arcs}<text x="70" y="74" text-anchor="middle">${short(total)}</text></svg>`;
+  w.innerHTML = `<svg viewBox="0 0 140 140" role="img" aria-label="${title}"><defs><mask id="${mid}" maskUnits="userSpaceOnUse" x="0" y="0" width="140" height="140"><circle class="dmask" cx="70" cy="70" r="${R}" fill="none" stroke="#fff" stroke-width="30" stroke-dasharray="${C}" stroke-dashoffset="0" transform="rotate(-90 70 70)" style="--C:${C}"/></mask></defs><g mask="url(#${mid})">${arcs}</g><text x="70" y="74" text-anchor="middle">${short(total)}</text></svg>`;
   const lg = el("div", "legend");
   data.forEach((d, i) => {
     const row = el("div"), sw = el("i");
@@ -1230,8 +1246,8 @@ function barsBox(ym, month){
   for (let d = 1; d <= days; d++) {
     const x = (d - 1) * slot, bw = Math.max(2, slot * .36);
     const hi = inc[d] / max * (base - top), he = exp[d] / max * (base - top);
-    if (inc[d]) s += `<rect x="${x + slot * .1}" y="${base - hi}" width="${bw}" height="${hi}" rx="2" fill="#5fd38d"><title>Tgl ${d}: pemasukan ${rupiah(inc[d])}</title></rect>`;
-    if (exp[d]) s += `<rect x="${x + slot * .1 + bw + 1}" y="${base - he}" width="${bw}" height="${he}" rx="2" fill="#ff6b72"><title>Tgl ${d}: pengeluaran ${rupiah(exp[d])}</title></rect>`;
+    if (inc[d]) s += `<rect class="bar" style="--d:${(d*.02).toFixed(2)}s" x="${x + slot * .1}" y="${base - hi}" width="${bw}" height="${hi}" rx="2" fill="#5fd38d"><title>Tgl ${d}: pemasukan ${rupiah(inc[d])}</title></rect>`;
+    if (exp[d]) s += `<rect class="bar" style="--d:${(d*.02).toFixed(2)}s" x="${x + slot * .1 + bw + 1}" y="${base - he}" width="${bw}" height="${he}" rx="2" fill="#ff6b72"><title>Tgl ${d}: pengeluaran ${rupiah(exp[d])}</title></rect>`;
     if (d === 1 || d % 5 === 0) s += `<text x="${x + slot / 2}" y="${base + 18}" text-anchor="middle">${d}</text>`;
   }
   const key = el("div", "key"); key.innerHTML = '<span><i style="background:#5fd38d"></i>Pemasukan</span><span><i style="background:#ff6b72"></i>Pengeluaran</span>';
@@ -1280,16 +1296,41 @@ function renderCharts(ym, month){
   dn.appendChild(donutBox("Tabungan per tujuan", goals.filter(g => g.saved > 0).map(g => ({label:g.label, val:g.saved}))));
   if (goals.length) c.appendChild(goalsBox(goals));
 }
+function setNum(id, txt){ const e = $(id); e.dataset.final = txt; if (!e._busy) e.textContent = txt; }
+function scrambleEl(e, dur = 1300){
+  const tok = e._tok = (e._tok || 0) + 1, t0 = performance.now(); let last = 0;
+  e._busy = true;
+  (function step(now){
+    if (e._tok !== tok) return;
+    const fin = e.dataset.final || e.textContent, p = Math.min(1, (now - t0) / dur);
+    if (p >= 1) { e._busy = false; e.textContent = fin; return; }
+    if (now - last > 45) {
+      last = now;
+      const lock = Math.floor(p * p * fin.length);
+      let out = "";
+      for (let i = 0; i < fin.length; i++) out += (/\d/.test(fin[i]) && i >= lock) ? Math.floor(Math.random() * 10) : fin[i];
+      e.textContent = out;
+    }
+    requestAnimationFrame(step);
+  })(t0);
+}
+function playFinanceAnim(){
+  if (matchMedia("(prefers-reduced-motion:reduce)").matches) return;
+  const m = $("m-uang");
+  m.classList.remove("fin-play"); void m.offsetWidth; m.classList.add("fin-play");
+  ["sIn","sOut","sSave","sCash"].forEach(id => scrambleEl($(id)));
+  clearTimeout(m._ft); m._ft = setTimeout(() => m.classList.remove("fin-play"), 3400);
+}
 function renderExp(){
   const ym = expMonth.value || todayISO().slice(0, 7);
   const inM = t => sum(x => x.type === t && x.date.startsWith(ym));
   const all = t => sum(x => x.type === t);
   $("lblIn").textContent = "Pemasukan " + fmtMonth(ym);
   $("lblOut").textContent = "Pengeluaran " + fmtMonth(ym);
-  $("sIn").textContent = rupiah(inM("in"));
-  $("sOut").textContent = rupiah(inM("out") + inM("sout"));
-  $("sSave").textContent = rupiah(all("save") - all("sout"));
-  $("sCash").textContent = rupiah(all("in") - all("out") - all("save"));
+  setNum("sIn", rupiah(inM("in")));
+  setNum("sOut", rupiah(inM("out") + inM("sout")));
+  setNum("sSave", rupiah(all("save") - all("sout")));
+  setNum("sCash", rupiah(all("in") - all("out") - all("save")));
   const view = $("expView"); view.innerHTML = "";
   const month = expenses.filter(x => x.date.startsWith(ym));
   renderCharts(ym, month);
@@ -1334,7 +1375,7 @@ $("expForm").addEventListener("submit", e => {
   expMonth.value = date.slice(0, 7);
   saveExp(); renderExp(); closeAdd($("expForm")); toast("Catatan ditambahkan");
 });
-expMonth.onchange = () => { if (!expMonth.value) expMonth.value = todayISO().slice(0, 7); renderExp(); };
+expMonth.onchange = () => { if (!expMonth.value) expMonth.value = todayISO().slice(0, 7); renderExp(); playFinanceAnim(); };
 renderExp();
 
 /* PORTOFOLIO — GitHub */
