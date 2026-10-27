@@ -157,8 +157,8 @@ select.field option{background:var(--nb);color:var(--nt)}
       try { localStorage.setItem("neu-mode", m); } catch (e) {}
       sync();
     };
-    var reduced = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!document.startViewTransition || reduced) { apply(); return; }
+    // Cek prefers-reduced-motion dihapus agar animasi menyebar selalu tampil di laptop.
+    if (!document.startViewTransition) { apply(); return; }
     var r = btn.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
     var end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
     var t = document.startViewTransition(apply);
