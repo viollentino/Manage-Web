@@ -286,6 +286,9 @@ select.field option{background:#1a0a0c}
 .task label{cursor:pointer;overflow-wrap:anywhere;font-weight:600;text-transform:uppercase;letter-spacing:.02em;font-size:.9rem}
 .task.done{opacity:.7}
 .task.done label{text-decoration:line-through;color:var(--muted)}
+.chip.on{background:rgba(var(--acc-rgb),.35);border-color:var(--acc-text);color:#fff}
+.task .tnote{flex:1 0 100%;color:var(--muted);font-size:.78rem;font-weight:400;overflow-wrap:anywhere;white-space:pre-wrap}
+textarea.field{resize:vertical;min-height:64px;font-family:inherit}
 .pill{font-size:.72rem;font-weight:700;padding:.1rem .65rem;border-radius:999px;white-space:nowrap;background:rgba(95,211,141,.15);color:var(--ok)}
 .pill.soon{background:rgba(240,195,106,.15);color:var(--warn)}
 .pill.late{background:rgba(255,107,114,.16);color:var(--bad)}
@@ -574,6 +577,13 @@ body.in .gate{display:none}
             <h5>Tambah tugas baru</h5>
             <form class="form" id="todoForm" style="margin-bottom:0">
               <input class="field fl full" type="text" id="todoInput" placeholder="Tulis tugas baru…" maxlength="120" autocomplete="off" aria-label="Tugas">
+              <div class="fl full"><span>Mata kuliah (pilih dari jadwal)</span>
+                <div class="chips" id="subjChips"></div>
+                <input class="field" type="text" id="todoSubject" placeholder="Atau ketik mapel sendiri…" maxlength="60" autocomplete="off">
+              </div>
+              <label class="fl full">Keterangan tugas
+                <textarea class="field" id="todoNote" rows="2" placeholder="Contoh: Bab 3, dikumpul lewat LMS" maxlength="300"></textarea>
+              </label>
               <label class="fl grow">Deadline<input class="field" type="date" id="todoDue"></label>
               <button class="submit" type="submit">TAMBAH (+)</button>
             </form>
@@ -1010,7 +1020,7 @@ const DEFAULT_TASKS = [
   {text:"Merapikan catatan kuliah", done:true, due:null}
 ];
 const TASK_KEY = "todo-profil-v1", EXP_KEY = "pengeluaran-profil-v1", CLS_KEY = "jadwal-kuliah-v1", MAP_KEY = "roblox-maps-v1";
-const normTasks = a => (a || []).map(t => ({text:t.text, done:!!t.done, due:t.due || null}));
+const normTasks = a => (a || []).map(t => ({text:t.text, done:!!t.done, due:t.due || null, subject:t.subject || "", note:t.note || ""}));
 const normExp = a => (a || []).map(x => ({...x, type: x.type || "out", src: x.src || "", goal: x.goal || "", place: x.place || "", target: Number(x.target) || 0}));
 let tasks = normTasks(loadJSON(TASK_KEY, DEFAULT_TASKS));
 let expenses = normExp(loadJSON(EXP_KEY, []));
@@ -1037,6 +1047,21 @@ const closeAdd = form => { const w = form.closest(".addwrap"); if (w) setAdd(w, 
 
 /* TUGAS */
 const list = $("todoList"), input = $("todoInput"), dueInput = $("todoDue");
+const subjInput = $("todoSubject"), noteInput = $("todoNote");
+function subjectList(){
+  return [...new Set(classes.map(c => (c.name || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "id"));
+}
+function renderSubjectChips(){
+  const host = $("subjChips"); host.innerHTML = "";
+  const subs = subjectList();
+  if (!subs.length) { host.appendChild(el("span", "cal-note", "Belum ada mapel. Tambahkan dulu di menu Jadwal.")); return; }
+  subs.forEach(n => {
+    const b = el("button", "chip" + (subjInput.value.trim() === n ? " on" : ""), n); b.type = "button";
+    b.onclick = () => { subjInput.value = subjInput.value.trim() === n ? "" : n; renderSubjectChips(); };
+    host.appendChild(b);
+  });
+}
+subjInput.addEventListener("input", renderSubjectChips);
 const calTask = makeCal($("taskCal"), "Kalender tugas", () => {
   const s = new Set(tasks.filter(t => !t.done && t.due).map(t => t.due));
   return d => s.has(toISO(d));
@@ -1077,7 +1102,10 @@ function renderTasks(){
     const body = el("div", "body");
     const label = el("label", "", t.text); label.htmlFor = cb.id;
     const info = dueInfo(t);
-    body.append(label, el("span", "pill " + info.cls, info.label));
+    body.append(label);
+    if (t.subject) body.appendChild(el("span", "pill save", t.subject));
+    body.appendChild(el("span", "pill " + info.cls, info.label));
+    if (t.note) body.appendChild(el("small", "tnote", t.note));
     const del = el("button", "del", "×"); del.type = "button"; del.setAttribute("aria-label", "Hapus tugas");
     cb.onchange = () => { t.done = cb.checked; saveTasks(); renderTasks(); };
     del.onclick = () => { tasks.splice(tasks.indexOf(t), 1); saveTasks(); renderTasks(); };
@@ -1096,8 +1124,9 @@ $("todoForm").addEventListener("submit", e => {
   e.preventDefault();
   const text = input.value.trim();
   if (!text) { input.focus(); return; }
-  tasks.push({text, done:false, due:dueInput.value || null});
-  input.value = ""; dueInput.value = "";
+  tasks.push({text, done:false, due:dueInput.value || null, subject:subjInput.value.trim(), note:noteInput.value.trim()});
+  input.value = ""; dueInput.value = ""; subjInput.value = ""; noteInput.value = "";
+  renderSubjectChips();
   saveTasks(); renderTasks(); closeAdd($("todoForm")); toast("Tugas ditambahkan");
 });
 renderTasks();
@@ -1619,6 +1648,7 @@ function renderSchedule(){
   const total = classes.filter(c => DAYS.includes(c.day)).length;
   $("clsStat").innerHTML = ringSVG(total ? nToday / total : 0, nToday, ["MATA KULIAH", "AKTIF HARI INI"]);
   calCls();
+  renderSubjectChips();
 }
 $("clsForm").addEventListener("submit", e => {
   e.preventDefault();
