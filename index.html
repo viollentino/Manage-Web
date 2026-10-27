@@ -418,8 +418,8 @@ textarea.field{resize:vertical;min-height:64px;font-family:inherit}
 @media(min-width:760px){.j-two{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* LOGIN */
-.gate{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:1.25rem;overflow:auto;background-color:var(--bg1);background-image:radial-gradient(ellipse at 65% 50%,var(--bg2),var(--bg3) 50%,var(--bg1))}
-body.in .gate{display:none}
+.gate{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:1.25rem;overflow:auto;background-color:var(--bg1);background-image:radial-gradient(ellipse at 65% 50%,var(--bg2),var(--bg3) 50%,var(--bg1))}
+body.out .gate{display:grid}
 .gate-card{width:min(420px,100%);display:grid;gap:.9rem;padding:2rem;border-radius:20px}
 .gate-card h2{font:800 1.6rem Montserrat,sans-serif}
 .gate-card p{color:var(--muted);font-size:.88rem}
@@ -1682,6 +1682,7 @@ function renderAll(){ renderTasks(); renderExp(); renderSchedule(); renderMaps()
 auth.onAuthStateChanged(async user => {
   currentUser = user;
   document.body.classList.toggle("in", !!user);
+  document.body.classList.toggle("out", !user);
   if (!user) {
     tasks = DEFAULT_TASKS.map(t => ({...t})); expenses = []; classes = []; maps = []; hobiPics = {};
     saveJSON(TASK_KEY, tasks); saveJSON(EXP_KEY, expenses); saveJSON(CLS_KEY, classes); saveJSON(MAP_KEY, maps); saveJSON(HOBI_KEY, hobiPics);
