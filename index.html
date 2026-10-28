@@ -440,9 +440,11 @@ body.out .gate{display:grid}
 .toast{position:fixed;right:1.2rem;bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));z-index:120;padding:.8rem 1.1rem;border-radius:12px;font-size:.82rem;border:1px solid rgba(var(--acc-rgb),.5);transform:translateY(80px);opacity:0;transition:.5s;pointer-events:none}
 .toast.show{transform:none;opacity:1}
 </style>
+   <link rel="stylesheet" href="login-loader.css">
 <script src="neumorphism.js" defer></script>
 </head>
 <body>
+     <script src="login-loader.js"></script>
 
 <div class="gate" id="authGate">
   <form class="glass gate-card" id="authForm">
