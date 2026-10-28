@@ -1,48 +1,79 @@
 /* Loading screen + login baru untuk Viollen. Pasang tepat setelah <body>. */
 (function(){
   var B = document.body;
-  var L = document.createElement("div");
-  L.className = "loader"; L.setAttribute("role", "status"); L.setAttribute("aria-label", "Memuat");
-  L.innerHTML = '<div class="ld-in"><div class="ld-logo"><img class="ld-base" src="logo_viollen.png" alt=""><img class="ld-fill" src="logo_viollen.png" alt=""><span class="ld-scan"></span></div>'
-    + '<div class="ld-meta"><div class="ld-pct"><span id="ldPct">0</span><small>%</small></div><div class="ld-bar"><i></i></div><p class="ld-st" id="ldSt">Menyiapkan tampilan</p></div></div>';
-  B.prepend(L);
-  var pct = L.querySelector("#ldPct"), st = L.querySelector("#ldSt");
-  var ready = {load: document.readyState === "complete", fonts: false, auth: false};
-  var p = 0, t0 = performance.now(), finished = false, held = "out";
+  var holdNow = true, authDone = false, wasOut = false, held = "out";
+
+  function mkLoader(){
+    var L = document.createElement("div");
+    L.className = "loader"; L.setAttribute("role", "status"); L.setAttribute("aria-label", "Memuat");
+    L.innerHTML = '<div class="ld-in"><div class="ld-logo"><img class="ld-base" src="logo_viollen.png" alt=""><img class="ld-fill" src="logo_viollen.png" alt=""><span class="ld-scan"></span></div>'
+      + '<div class="ld-meta"><div class="ld-pct"><span class="n">0</span><small>%</small></div><div class="ld-bar"><i></i></div><p class="ld-st">Menyiapkan tampilan</p></div></div>';
+    B.prepend(L);
+    return {el: L, n: L.querySelector(".n"), st: L.querySelector(".ld-st")};
+  }
+  function paint(o, p, labels){
+    o.el.style.setProperty("--p", p.toFixed(1) + "%");
+    o.n.textContent = Math.round(p);
+    o.st.textContent = p < 35 ? labels[0] : p < 75 ? labels[1] : p < 100 ? labels[2] : "Siap";
+  }
+
+  /* ===== loading awal ===== */
+  var first = mkLoader(), ready = {load: document.readyState === "complete", fonts: false};
   addEventListener("load", function(){ ready.load = true; });
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(function(){ ready.fonts = true; });
+
   // tahan class "in/out" dari skrip utama sampai loading selesai
-  function hold(){
-    if (finished) return;
-    var c = B.classList;
-    if (c.contains("in") || c.contains("out")) { held = c.contains("in") ? "in" : "out"; ready.auth = true; c.remove("in", "out"); }
+  function onClass(){
+    var c = B.classList, isIn = c.contains("in"), isOut = c.contains("out");
+    if (!isIn && !isOut) return;
+    if (!holdNow && wasOut && isIn) startAuthLoader();   // login lewat popup Google
+    if (holdNow) { held = isIn ? "in" : "out"; authDone = true; c.remove("in", "out"); return; }
+    wasOut = isOut;
   }
-  new MutationObserver(hold).observe(B, {attributes: true, attributeFilter: ["class"]});
-  hold();
-  function finish(){
-    finished = true; B.classList.add(held); L.classList.add("done");
-    setTimeout(function(){ L.remove(); }, 1300);
-  }
+  new MutationObserver(onClass).observe(B, {attributes: true, attributeFilter: ["class"]});
+  onClass();
+
+  var p = 0, t0 = performance.now();
   function tick(now){
-    var el = now - t0, all = (ready.load && ready.fonts && ready.auth) || el > 7000;
+    var el = now - t0, all = (ready.load && ready.fonts && authDone) || el > 7000;
     var target = all && el > 2000 ? 100 : Math.min(88, el / 2600 * 88);
     p += (target - p) * .08;
     if (target === 100 && p > 99.3) p = 100;
-    L.style.setProperty("--p", p.toFixed(1) + "%");
-    pct.textContent = Math.round(p);
-    st.textContent = p < 35 ? "Menyiapkan tampilan" : p < 75 ? "Memuat data" : p < 100 ? "Hampir siap" : "Siap";
-    if (p >= 100) return finish();
+    paint(first, p, ["Menyiapkan tampilan", "Memuat data", "Hampir siap"]);
+    if (p >= 100) {
+      holdNow = false; wasOut = held === "out";
+      B.classList.add(held); first.el.classList.add("done");
+      setTimeout(function(){ first.el.remove(); }, 1300);
+      return;
+    }
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
 
-  // ubah form login yang ada (handler Firebase tetap utuh)
+  /* ===== loading saat login ===== */
+  var A = null;
+  function startAuthLoader(){
+    if (A) return;
+    holdNow = true; authDone = false; held = "out";
+    A = mkLoader(); var a = 0, t = performance.now(), dead = false, me = A;
+    function end(cls, ms){ dead = true; holdNow = false; me.el.classList.add(cls); setTimeout(function(){ me.el.remove(); }, ms); if (A === me) A = null; }
+    me.cancel = function(){ end("fade", 600); };
+    setTimeout(function(){ if (!dead) { me.cancel(); } }, 20000);
+    (function step(now){
+      if (dead) return;
+      var el = now - t, target = authDone && el > 900 ? 100 : Math.min(85, el / 2200 * 85);
+      a += (target - a) * .1;
+      if (target === 100 && a > 99.3) a = 100;
+      paint(me, a, ["Memeriksa akun", "Menyinkronkan data", "Hampir siap"]);
+      if (a >= 100) { wasOut = held === "out"; B.classList.add(held); end("done", 1300); return; }
+      requestAnimationFrame(step);
+    })(t);
+  }
+
+  /* ===== ubah form login yang ada (handler Firebase tetap utuh) ===== */
   document.addEventListener("DOMContentLoaded", function(){
     var g = document.getElementById("authGate"), f = document.getElementById("authForm");
     if (!g || !f) return;
-    var bg = document.createElement("div"); bg.className = "gate-bg"; bg.setAttribute("aria-hidden", "true");
-    bg.innerHTML = '<div class="gb-side"></div><div class="gb-top"></div><div class="gb-hot"></div><div class="gb-hot" style="background:rgba(111,177,255,.22)"></div><div class="gb-hot" style="background:rgba(95,211,141,.2)"></div><div class="gb-wide"><svg viewBox="0 0 300 120" preserveAspectRatio="none"><path d="M0 100 C40 90 60 40 100 55 S160 100 200 50 S270 20 300 40 V120 H0Z" fill="rgba(var(--acc-rgb),.45)"/></svg></div><div></div>';
-    g.prepend(bg);
     ["h2", ".brand"].forEach(function(s){ var n = f.querySelector(s); if (n) n.remove(); });
     var intro = f.querySelector("p:not(.err)"); if (intro) intro.remove();
     var logo = document.createElement("div"); logo.className = "gate-logo";
@@ -74,5 +105,14 @@
     var su = document.getElementById("btnSignup"), go2 = document.getElementById("btnGoogle");
     su.className = ""; su.textContent = "Daftar akun"; go2.className = ""; go2.textContent = "Google";
     alt.append(su, go2); f.appendChild(alt);
+
+    // animasi loading saat proses login
+    f.addEventListener("submit", startAuthLoader);
+    su.addEventListener("click", function(){ if (f.checkValidity()) startAuthLoader(); });
+    // kalau gagal (ada pesan error), loading ditutup
+    var msg = document.getElementById("authMsg");
+    new MutationObserver(function(){
+      if (msg.textContent.trim() && A && A.cancel) A.cancel();
+    }).observe(msg, {childList: true, characterData: true, subtree: true});
   });
 })();

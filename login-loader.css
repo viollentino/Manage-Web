@@ -19,12 +19,11 @@
 @media(prefers-reduced-motion:reduce){.ld-logo{animation:none}.loader,.loader.done{transition-duration:.01s}}
 
 /* LOGIN */
-.gate-bg{position:fixed;inset:4vh 4vw;display:grid;grid-template-columns:150px 1fr 1fr 1fr;grid-template-rows:70px 1fr 1fr;gap:1rem;filter:blur(7px) saturate(1.1);opacity:.5;pointer-events:none;transform:scale(1.02)}
-.gate-bg>*{border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
-.gate-bg .gb-side{grid-row:1/4}.gate-bg .gb-top{grid-column:2/5}.gate-bg .gb-wide{grid-column:2/4}
-.gate-bg .gb-hot{background:rgba(var(--acc-rgb),.3)}
-.gate-bg svg{width:100%;height:100%;display:block}
-@media(max-width:700px){.gate-bg{grid-template-columns:1fr 1fr;grid-template-rows:60px 1fr 1fr}.gate-bg .gb-side{display:none}.gate-bg .gb-top,.gate-bg .gb-wide{grid-column:1/3}}
+/* latar login = halaman utama asli yang di-blur */
+body.out .gate{background:rgba(6,2,3,.38);backdrop-filter:blur(10px) saturate(1.1);-webkit-backdrop-filter:blur(10px) saturate(1.1)}
+body.out .hero-obj,body.out .social{opacity:1}
+body.out .smoke{opacity:1;transition:none}
+.loader.fade{transform:none;opacity:0;visibility:hidden;transition:opacity .45s,visibility 0s linear .45s}
 .gate-card{position:relative;width:min(400px,100%);display:grid;gap:1rem;padding:2.2rem 1.8rem 1.8rem;border-radius:28px;background:rgba(24,10,12,.55);box-shadow:0 30px 80px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.05) inset,0 0 60px rgba(var(--acc-rgb),.18)}
 .gate-logo{display:grid;justify-items:center;gap:.5rem;margin-bottom:.4rem}
 .gate-logo img{width:84px;height:84px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(var(--acc-rgb),.7))}
